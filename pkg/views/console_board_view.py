@@ -1,3 +1,4 @@
+from pkg.constants.game import PLAYER_CHARS
 from pkg.models.board import Board
 
 
@@ -18,8 +19,8 @@ class ConsoleBoardView:
             topping_of_top_cells = '  ' + ''.join([' / \\' for _ in range(w)])
             print(topping_of_top_cells)
 
-            def s(i):
-                return ' ' if i == 0 else '*' if i == 1 else 'O'
+            def char(player):
+                return PLAYER_CHARS[player]
 
             for y in range(h):
                 y_index = y + 1
@@ -27,7 +28,7 @@ class ConsoleBoardView:
                 side_coord = str(y_index)
 
                 cells_center = indent + side_coord + ' '
-                cells_center += ''.join(['| ' + s(self._board.get_cell_xy(i + 1, y_index)) + ' ' for i in range(w)])
+                cells_center += ''.join(['| ' + char(self._board.get_cell_xy(i + 1, y_index)) + ' ' for i in range(w)])
                 cells_center += '| ' + side_coord
                 print(cells_center)
 

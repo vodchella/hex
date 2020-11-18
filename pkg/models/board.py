@@ -1,3 +1,6 @@
+from pkg.constants.game import PLAYER_NONE
+
+
 class Board:
     _width: int = 0
     _height: int = 0
@@ -6,7 +9,7 @@ class Board:
     def __init__(self, width, height):
         self._width = width
         self._height = height
-        self._cells = [0] * width * height
+        self._cells = [PLAYER_NONE] * width * height
 
     def _get_index_from_xy(self, x, y):
         return (y - 1) * self._width + (x - 1)

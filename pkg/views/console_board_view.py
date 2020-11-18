@@ -10,8 +10,8 @@ def char(player):
 class ConsoleBoardView:
     _board: Board = None
 
-    def __init__(self, view_board):
-        self._board = view_board
+    def __init__(self, board):
+        self._board = board
 
     def render(self):
         if self._board:

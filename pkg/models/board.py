@@ -29,8 +29,14 @@ class Board:
     def get_dimensions(self):
         return self._width, self._height
 
+    def get_size(self):
+        return self._width * self._height
+
     def get_cell_xy(self, x, y):
         return self._cells[self._get_index_from_xy(x, y)]
 
     def set_cell_xy(self, x, y, player):
         self._cells[self._get_index_from_xy(x, y)] = player
+
+    def get_cells(self):
+        return self._cells

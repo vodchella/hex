@@ -1,5 +1,10 @@
-from pkg.constants.game import PLAYER_CHARS
 from pkg.models.board import Board
+
+PLAYER_CHARS = [' ', '*', 'O']
+
+
+def char(player):
+    return PLAYER_CHARS[player]
 
 
 class ConsoleBoardView:
@@ -18,9 +23,6 @@ class ConsoleBoardView:
 
             topping_of_top_cells = '  ' + ''.join([' / \\' for _ in range(w)])
             print(topping_of_top_cells)
-
-            def char(player):
-                return PLAYER_CHARS[player]
 
             for y in range(h):
                 y_index = y + 1

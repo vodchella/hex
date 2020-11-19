@@ -1,7 +1,7 @@
 from pkg.models.board import Board
 
 
-class Base64BoardView:
+class BinaryBoardView:
     _board: Board = None
 
     def __init__(self, board):
@@ -30,3 +30,5 @@ class Base64BoardView:
                     byte = byte << (2 * (4 - cells_left - 1))
                     print(bin(byte))
                     result.append(byte)
+
+            return result

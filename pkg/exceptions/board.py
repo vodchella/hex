@@ -7,3 +7,7 @@ class BoardDimensionsException(UserDefinedException):
 
 class BoardIndexOutOfBounds(UserDefinedException):
     pass
+
+
+class BoardCoordinateOutOfBounds(UserDefinedException):
+    pass

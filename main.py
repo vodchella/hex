@@ -12,6 +12,8 @@ if __name__ == '__main__':
     board.set_cell_xy(1, 3, PLAYER_TWO)
     board.set_cell_xy(2, 3, PLAYER_NONE)
     board.set_cell_xy(3, 3, PLAYER_ONE)
+    board.set_cell_xy(4, 6, PLAYER_ONE)
+    board.set_cell_xy(5, 6, PLAYER_TWO)
 
     c_view = ConsoleBoardView(board)
     c_view.render()

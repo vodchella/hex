@@ -30,7 +30,7 @@ class ConsoleBoardView:
                 side_coord = str(y_index)
 
                 cells_center = indent + side_coord + ' '
-                cells_center += ''.join(['| ' + char(self._board.get_cell_xy(i + 1, y_index)) + ' ' for i in range(w)])
+                cells_center += ''.join(['| ' + char(self._board.get_cell_by_xy(i + 1, y_index)) + ' ' for i in range(w)])
                 cells_center += '| ' + side_coord
                 print(cells_center)
 

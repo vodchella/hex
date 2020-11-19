@@ -12,8 +12,13 @@ class BinaryBoardView:
 
     def render(self):
         if self._board:
+            w, h = self._board.get_dimensions()
+            dim_byte = w
+            dim_byte = dim_byte << 4
+            dim_byte += h
+            result = [dim_byte]
+
             board_size = self._board.get_size()
-            result = []
             byte = 0
 
             for (i, cell) in enumerate(self._board.get_cells(), start=1):

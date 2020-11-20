@@ -3,6 +3,15 @@ from pkg.exceptions.board import BoardDimensionsException, BoardIndexOutOfBounds
 
 BOARD_MAX_SIZE = 11
 
+DIRECTIONS = [
+    (+0, -1),  # top left
+    (+1, -1),  # top right
+    (+1, +0),  # right
+    (+0, +1),  # bottom right
+    (-1, +1),  # bottom left
+    (-1, +0),  # left
+]
+
 
 class Board:
     _check_bounds: bool = True
@@ -22,14 +31,19 @@ class Board:
         self._height = height
         self._cells = cells if cells else [PLAYER_NONE] * width * height
 
+    def _is_index_valid(self, index):
+        return 0 <= index < len(self._cells)
+
+    def _is_xy_valid(self, x, y):
+        return (1 <= x <= self._width) and (1 <= y <= self._height)
+
     def _check_board_index(self, index):
-        if index < 0 or index > len(self._cells) - 1:
+        if not self._is_index_valid(index):
             raise BoardIndexOutOfBounds(f'Index {index} is out of board bounds')
 
-    def _get_index_from_xy(self, x, y):
-        if self._check_bounds and (x > BOARD_MAX_SIZE or y > BOARD_MAX_SIZE):
-            coord = x if x > y else y
-            raise BoardCoordinateOutOfBounds(f'Coordinate {coord} is out of board bounds')
+    def _get_index_from_xy(self, x, y, check_bounds=True):
+        if check_bounds and self._check_bounds and not self._is_xy_valid(x, y):
+            raise BoardCoordinateOutOfBounds(f'Coordinates {x}, {y} is out of board bounds')
         return (y - 1) * self._width + (x - 1)
 
     def _get_xy_from_index(self, index):
@@ -62,6 +76,16 @@ class Board:
         if self._check_bounds:
             self._check_board_index(index)
         self._cells[index] = player
+
+    def get_cell_neighbors_by_xy(self, x, y):
+        result = []
+        for d in DIRECTIONS:
+            nx = x + d[0]
+            ny = y + d[1]
+            if self._is_xy_valid(nx, ny):
+                index = self._get_index_from_xy(nx, ny, check_bounds=False)
+                result.append(index)
+        return result
 
     def copy(self):
         copied_cells = self._cells.copy()

@@ -32,6 +32,14 @@ class Board:
             raise BoardCoordinateOutOfBounds(f'Coordinate {coord} is out of board bounds')
         return (y - 1) * self._width + (x - 1)
 
+    def _get_xy_from_index(self, index):
+        if self._check_bounds:
+            self._check_board_index(index)
+        y, x = divmod(index, self._width)
+        x += 1
+        y += 1
+        return x, y
+
     def get_dimensions(self):
         return self._width, self._height
 

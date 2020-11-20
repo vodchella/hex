@@ -36,9 +36,7 @@ class Board:
         if self._check_bounds:
             self._check_board_index(index)
         y, x = divmod(index, self._width)
-        x += 1
-        y += 1
-        return x, y
+        return x + 1, y + 1
 
     def get_dimensions(self):
         return self._width, self._height

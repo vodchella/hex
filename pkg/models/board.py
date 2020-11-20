@@ -88,5 +88,6 @@ class Board:
         return result
 
     def copy(self):
-        copied_cells = self._cells.copy()
-        return Board(self._width, self._height, cells=copied_cells)
+        if self._cells:
+            copied_cells = self._cells.copy()
+            return Board(self._width, self._height, cells=copied_cells)

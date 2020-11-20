@@ -11,6 +11,9 @@ class ConsoleBoardView:
     _board: Board = None
 
     def __init__(self, board):
+        self.set_board(board)
+
+    def set_board(self, board):
         self._board = board
 
     def render(self):

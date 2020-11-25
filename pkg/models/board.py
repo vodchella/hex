@@ -41,15 +41,25 @@ class Board:
         if not self._is_index_valid(index):
             raise BoardIndexOutOfBounds(f'Index {index} is out of board bounds')
 
-    def _get_index_from_xy(self, x, y):
+    def _check_board_xy(self, x, y):
         if not self._is_xy_valid(x, y):
             raise BoardCoordinateOutOfBounds(f'Coordinates {x}, {y} is out of board bounds')
+
+    def _get_index_from_xy(self, x, y):
+        self._check_board_xy(x, y)
         return (y - 1) * self._width + (x - 1)
 
     def _get_xy_from_index(self, index):
         self._check_board_index(index)
         y, x = divmod(index, self._width)
         return x + 1, y + 1
+
+    def _get_cube_from_xy(self, x, y):
+        self._check_board_xy(x, y)
+        x1 = y - 1
+        z1 = x - 1
+        y1 = -x1 - z1
+        return x1, y1, z1
 
     def get_dimensions(self):
         return self._width, self._height
@@ -82,6 +92,11 @@ class Board:
             if self._is_xy_valid(nx, ny):
                 result.append((nx, ny))
         return result
+
+    def get_distance(self, x1, y1, x2, y2):
+        h1 = self._get_cube_from_xy(x1, y1)
+        h2 = self._get_cube_from_xy(x2, y2)
+        return (abs(h1[0] - h2[0]) + abs(h1[1] - h2[1]) + abs(h1[2] - h2[2])) / 2
 
     def copy(self):
         if self._cells:

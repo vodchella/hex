@@ -12,3 +12,5 @@ if __name__ == '__main__':
 
     c_view = ConsoleBoardView(board)
     c_view.render()
+
+    print(board.get_distance(3, 2, 1, 2))

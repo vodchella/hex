@@ -88,13 +88,24 @@ class Board:
         self._check_board_index(index)
         self._cells[index] = player
 
-    def get_cell_neighbors_by_xy(self, x, y):
+    def get_cell_neighbors_by_xy(self, x, y, exclude_players=None):
         result = []
         for d in DIRECTIONS:
             nx = x + d[0]
             ny = y + d[1]
+
+            append = False
             if self._is_xy_valid(nx, ny):
+                if exclude_players:
+                    player = self.get_cell_by_xy(nx, ny)
+                    if player not in exclude_players:
+                        append = True
+                else:
+                    append = True
+
+            if append:
                 result.append((nx, ny))
+
         return result
 
     def get_distance(self, x1, y1, x2, y2):

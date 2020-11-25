@@ -83,8 +83,7 @@ class Board:
             nx = x + d[0]
             ny = y + d[1]
             if self._is_xy_valid(nx, ny):
-                index = self._get_index_from_xy(nx, ny, check_bounds=False)
-                result.append(index)
+                result.append((nx, ny))
         return result
 
     def copy(self):

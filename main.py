@@ -7,8 +7,8 @@ if __name__ == '__main__':
     board.set_cell_by_xy(3, 1, PLAYER_ONE)
 
     neighbors = board.get_cell_neighbors_by_xy(3, 1)
-    for i in neighbors:
-        board.set_cell_by_index(i, PLAYER_TWO)
+    for n in neighbors:
+        board.set_cell_by_xy(n[0], n[1], PLAYER_TWO)
 
     c_view = ConsoleBoardView(board)
     c_view.render()

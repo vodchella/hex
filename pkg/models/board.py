@@ -16,6 +16,8 @@ DIRECTIONS = [
 class Board:
     _width: int = 0
     _height: int = 0
+    _max_x: int = 0
+    _max_y: int = 0
     _cells = []
 
     def __init__(self, width, height, check_bounds=True, cells=None):
@@ -29,13 +31,15 @@ class Board:
 
         self._width = width
         self._height = height
+        self._max_x = width - 1
+        self._max_y = height - 1
         self._cells = cells if cells else [PLAYER_NONE] * width * height
 
     def _is_index_valid(self, index):
         return 0 <= index < len(self._cells)
 
     def _is_xy_valid(self, x, y):
-        return (1 <= x <= self._width) and (1 <= y <= self._height)
+        return (0 <= x <= self._max_x) and (0 <= y <= self._max_y)
 
     def _check_board_index(self, index):
         if not self._is_index_valid(index):
@@ -47,12 +51,12 @@ class Board:
 
     def _get_index_from_xy(self, x, y):
         self._check_board_xy(x, y)
-        return (y - 1) * self._width + (x - 1)
+        return y * self._width + x
 
     def _get_xy_from_index(self, index):
         self._check_board_index(index)
         y, x = divmod(index, self._width)
-        return x + 1, y + 1
+        return x, y
 
     def _get_cube_from_xy(self, x, y):
         self._check_board_xy(x, y)

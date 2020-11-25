@@ -28,17 +28,16 @@ class ConsoleBoardView:
             print(topping_of_top_cells)
 
             for y in range(h):
-                y_index = y + 1
                 indent = y * '  ' if y < 9 else (y - 1) * '  ' + ' '
-                side_coord = str(y_index)
+                side_coord = str(y + 1)
 
                 cells_center = indent + side_coord + ' '
-                cells_center += ''.join(['| ' + char(self._board.get_cell_by_xy(i + 1, y_index)) + ' ' for i in range(w)])
+                cells_center += ''.join(['| ' + char(self._board.get_cell_by_xy(i, y)) + ' ' for i in range(w)])
                 cells_center += '| ' + side_coord
                 print(cells_center)
 
                 cells_bottom = indent + ('  ' if y < 9 else '   ') + ''.join([' \\ /' for _ in range(w)])
-                cells_bottom += ' \\' if y_index < h else ''
+                cells_bottom += ' \\' if y < (h - 1) else ''
                 print(cells_bottom)
 
             print('  ' * (h - 1) + symbol_coordinates)

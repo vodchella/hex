@@ -4,13 +4,11 @@ from pkg.views.console_board_view import ConsoleBoardView
 
 if __name__ == '__main__':
     board = Board(3, 3)
-    board.set_cell_by_xy(3, 1, PLAYER_ONE)
+    board.set_cell_by_xy(2, 0, PLAYER_ONE)
 
-    neighbors = board.get_cell_neighbors_by_xy(3, 1)
+    neighbors = board.get_cell_neighbors_by_xy(2, 0)
     for n in neighbors:
         board.set_cell_by_xy(n[0], n[1], PLAYER_TWO)
 
     c_view = ConsoleBoardView(board)
     c_view.render()
-
-    print(board.get_distance(3, 2, 1, 2))

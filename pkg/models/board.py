@@ -14,7 +14,6 @@ DIRECTIONS = [
 
 
 class Board:
-    _check_bounds: bool = True
     _width: int = 0
     _height: int = 0
     _cells = []
@@ -25,8 +24,9 @@ class Board:
                 raise BoardDimensionsException('Board size can\'t be less than one')
             if width > BOARD_MAX_SIZE or height > BOARD_MAX_SIZE:
                 raise BoardDimensionsException('Board size can\'t be greater than eleven')
+            if cells and len(cells) != width * height:
+                raise BoardDimensionsException('Board size doesn\'t match to cells array')
 
-        self._check_bounds = check_bounds
         self._width = width
         self._height = height
         self._cells = cells if cells else [PLAYER_NONE] * width * height
@@ -41,14 +41,13 @@ class Board:
         if not self._is_index_valid(index):
             raise BoardIndexOutOfBounds(f'Index {index} is out of board bounds')
 
-    def _get_index_from_xy(self, x, y, check_bounds=True):
-        if check_bounds and self._check_bounds and not self._is_xy_valid(x, y):
+    def _get_index_from_xy(self, x, y):
+        if not self._is_xy_valid(x, y):
             raise BoardCoordinateOutOfBounds(f'Coordinates {x}, {y} is out of board bounds')
         return (y - 1) * self._width + (x - 1)
 
     def _get_xy_from_index(self, index):
-        if self._check_bounds:
-            self._check_board_index(index)
+        self._check_board_index(index)
         y, x = divmod(index, self._width)
         return x + 1, y + 1
 
@@ -68,13 +67,11 @@ class Board:
         self._cells[self._get_index_from_xy(x, y)] = player
 
     def get_cell_by_index(self, index):
-        if self._check_bounds:
-            self._check_board_index(index)
+        self._check_board_index(index)
         return self._cells[index]
 
     def set_cell_by_index(self, index, player):
-        if self._check_bounds:
-            self._check_board_index(index)
+        self._check_board_index(index)
         self._cells[index] = player
 
     def get_cell_neighbors_by_xy(self, x, y):
@@ -89,4 +86,4 @@ class Board:
     def copy(self):
         if self._cells:
             copied_cells = self._cells.copy()
-            return Board(self._width, self._height, cells=copied_cells)
+            return Board(self._width, self._height, check_bounds=False, cells=copied_cells)

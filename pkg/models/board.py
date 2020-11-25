@@ -14,6 +14,7 @@ DIRECTIONS = [
 
 
 class Board:
+    _check_bounds: bool = True
     _width: int = 0
     _height: int = 0
     _max_x: int = 0
@@ -29,6 +30,7 @@ class Board:
             if cells and len(cells) != width * height:
                 raise BoardDimensionsException('Board size doesn\'t match to cells array')
 
+        self._check_bounds = check_bounds
         self._width = width
         self._height = height
         self._max_x = width - 1
@@ -50,16 +52,19 @@ class Board:
             raise BoardCoordinateOutOfBounds(f'Coordinates {x}, {y} is out of board bounds')
 
     def _get_index_from_xy(self, x, y):
-        self._check_board_xy(x, y)
+        if self._check_bounds:
+            self._check_board_xy(x, y)
         return y * self._width + x
 
     def _get_xy_from_index(self, index):
-        self._check_board_index(index)
+        if self._check_bounds:
+            self._check_board_index(index)
         y, x = divmod(index, self._width)
         return x, y
 
     def _get_cube_from_xy(self, x, y):
-        self._check_board_xy(x, y)
+        if self._check_bounds:
+            self._check_board_xy(x, y)
         x1 = y - 1
         z1 = x - 1
         y1 = -x1 - z1
@@ -89,6 +94,9 @@ class Board:
         self._cells[index] = player
 
     def get_cell_neighbors(self, x, y, exclude_players=None):
+        if self._check_bounds:
+            self._check_board_xy(x, y)
+
         result = []
         for d in DIRECTIONS:
             nx = x + d[0]
@@ -113,12 +121,12 @@ class Board:
         h2 = self._get_cube_from_xy(x2, y2)
         return (abs(h1[0] - h2[0]) + abs(h1[1] - h2[1]) + abs(h1[2] - h2[2])) / 2
 
-    def copy(self):
+    def copy(self, check_bounds=True):
         if self._cells:
             copied_cells = self._cells.copy()
             return Board(
                 self._width,
                 self._height,
-                check_bounds=False,
+                check_bounds=check_bounds,
                 cells=copied_cells
             )

@@ -74,10 +74,10 @@ class Board:
     def get_cells(self):
         return self._cells
 
-    def get_cell_by_xy(self, x, y):
+    def get_cell(self, x, y):
         return self._cells[self._get_index_from_xy(x, y)]
 
-    def set_cell_by_xy(self, x, y, player):
+    def set_cell(self, x, y, player):
         self._cells[self._get_index_from_xy(x, y)] = player
 
     def get_cell_by_index(self, index):
@@ -88,7 +88,7 @@ class Board:
         self._check_board_index(index)
         self._cells[index] = player
 
-    def get_cell_neighbors_by_xy(self, x, y, exclude_players=None):
+    def get_cell_neighbors(self, x, y, exclude_players=None):
         result = []
         for d in DIRECTIONS:
             nx = x + d[0]
@@ -97,7 +97,7 @@ class Board:
             append = False
             if self._is_xy_valid(nx, ny):
                 if exclude_players:
-                    player = self.get_cell_by_xy(nx, ny)
+                    player = self.get_cell(nx, ny)
                     if player not in exclude_players:
                         append = True
                 else:

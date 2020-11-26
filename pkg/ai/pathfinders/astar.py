@@ -15,7 +15,7 @@ class Node:
         self._id = y * 666 + x
 
     def __eq__(self, other):
-        return self._id == other.get_id()
+        return self._id == other.id()
 
     def __str__(self):
         return f'({self._x}, {self._y})'
@@ -23,20 +23,14 @@ class Node:
     def __repr__(self):
         return self.__str__()
 
-    def get_id(self):
+    def id(self):
         return self._id
 
-    def get_x(self):
+    def x(self):
         return self._x
 
-    def set_x(self, x):
-        self._x = x
-
-    def get_y(self):
+    def y(self):
         return self._y
-
-    def set_y(self, y):
-        self._y = y
 
     def get_cost(self):
         return self._cost
@@ -77,7 +71,7 @@ class AStar:
 
             reachable.remove(node)
             explored.append(node)
-            new_reachable = [Node(x, y) for (x, y) in board.get_cell_neighbors(node.get_x(), node.get_y(), [opponent])]
+            new_reachable = [Node(x, y) for (x, y) in board.get_cell_neighbors(node.x(), node.y(), [opponent])]
             new_reachable = [n for n in filter(lambda n: n not in explored, new_reachable)]
 
             for adjacent in new_reachable:

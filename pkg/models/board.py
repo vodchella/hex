@@ -62,14 +62,6 @@ class Board:
         y, x = divmod(index, self._width)
         return x, y
 
-    def _get_cube_from_xy(self, x, y):
-        if self._check_bounds:
-            self._check_board_xy(x, y)
-        x1 = y - 1
-        z1 = x - 1
-        y1 = -x1 - z1
-        return x1, y1, z1
-
     def get_dimensions(self):
         return self._width, self._height
 
@@ -115,11 +107,6 @@ class Board:
                 result.append((nx, ny))
 
         return result
-
-    def get_distance(self, x1, y1, x2, y2):
-        h1 = self._get_cube_from_xy(x1, y1)
-        h2 = self._get_cube_from_xy(x2, y2)
-        return (abs(h1[0] - h2[0]) + abs(h1[1] - h2[1]) + abs(h1[2] - h2[2])) / 2
 
     def copy(self, check_bounds=True):
         if self._cells:

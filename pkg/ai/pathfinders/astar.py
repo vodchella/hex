@@ -20,11 +20,6 @@ def choose_node(board: Board, nodes, dst_node: Node):
     return best_node
 
 
-class AStarPathfinder:
-    _pathfinder: BasicPathfinder = None
-
+class AStarPathfinder(BasicPathfinder):
     def __init__(self, board):
-        self._pathfinder = BasicPathfinder(board, choose_node)
-
-    def find_path(self, for_player, src_x, src_y, dst_x, dst_y):
-        return self._pathfinder.find_path(for_player, src_x, src_y, dst_x, dst_y)
+        super().__init__(board, choose_node)

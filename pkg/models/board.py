@@ -1,4 +1,4 @@
-from pkg.constants.game import PLAYER_NONE
+from pkg.constants.game import PLAYER_NONE, PLAYER_VIRTUAL
 from pkg.exceptions.board import BoardDimensionsException, BoardIndexOutOfBounds, BoardCoordinateOutOfBounds
 
 BOARD_MAX_SIZE = 11
@@ -75,7 +75,12 @@ class Board:
         return self._cells[self._get_index_from_xy(x, y)]
 
     def set_cell(self, x, y, player):
-        self._cells[self._get_index_from_xy(x, y)] = player
+        index = self._get_index_from_xy(x, y)
+        can_paste = True
+        if player == PLAYER_VIRTUAL:
+            can_paste = self._cells[index] == PLAYER_NONE
+        if can_paste:
+            self._cells[index] = player
 
     def set_cells(self, cells, player):
         for (x, y) in cells:

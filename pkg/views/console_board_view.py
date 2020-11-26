@@ -1,6 +1,6 @@
 from pkg.models.board import Board
 
-PLAYER_CHARS = [' ', '*', 'O']
+PLAYER_CHARS = [' ', 'O', '*', '-']
 
 
 def char(player):

@@ -1,3 +1,4 @@
+from pkg.constants.game import PLAYER_NONE, PLAYER_VIRTUAL
 from pkg.models.board import Board
 
 CELLS_IN_BYTE = 4
@@ -28,7 +29,7 @@ class BinaryBoardView:
                 cells_left = i % CELLS_IN_BYTE
                 byte_completed = cells_left == 0
 
-                byte += cell
+                byte += cell if cell != PLAYER_VIRTUAL else PLAYER_NONE
                 if not byte_completed:
                     byte = byte << BITS_PER_CELL
 

@@ -20,7 +20,7 @@ def choose_node(board: Board, nodes, dst_node: Node):
     return best_node
 
 
-class AStar:
+class AStarPathfinder:
     _pathfinder: BasicPathfinder = None
 
     def __init__(self, board):

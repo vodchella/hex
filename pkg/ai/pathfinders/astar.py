@@ -67,6 +67,14 @@ def choose_node(nodes, dst_node: Node):
     return best_node
 
 
+def build_path(to_node: Node):
+    path = []
+    while to_node is not None:
+        path.append((to_node.x(), to_node.y()))
+        to_node = to_node.get_previous()
+    return path
+
+
 def to_nodes(cells, cost):
     return [Node(x, y, cost=cost) for (x, y) in cells]
 
@@ -90,7 +98,7 @@ class AStar:
         while len(reachable) > 0:
             node = choose_node(reachable, dst_node)
             if node == dst_node:
-                return
+                return build_path(node)
 
             reachable.remove(node)
             explored.append(node)
@@ -107,4 +115,4 @@ class AStar:
                     adjacent.set_previous(node)
                     adjacent.set_cost(next_cost)
 
-        pass
+        return []

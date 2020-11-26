@@ -77,6 +77,10 @@ class Board:
     def set_cell(self, x, y, player):
         self._cells[self._get_index_from_xy(x, y)] = player
 
+    def set_cells(self, cells, player):
+        for (x, y) in cells:
+            self.set_cell(x, y, player)
+
     def get_cell_by_index(self, index):
         self._check_board_index(index)
         return self._cells[index]

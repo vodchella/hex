@@ -1,9 +1,9 @@
 import sys
 from pkg.constants.game import PLAYER_ONE, PLAYER_TWO
 from pkg.models.board import Board
+from pkg.utils.hex import get_distance
 
-
-INFINITE = sys.maxsize
+INFINITY = sys.maxsize
 
 
 class Node:
@@ -23,7 +23,7 @@ class Node:
         return self._id == other.id()
 
     def __str__(self):
-        cost = 'INF' if self._cost == INFINITE else self._cost
+        cost = 'INF' if self._cost == INFINITY else self._cost
         return f'({self._x}, {self._y}; c={cost})'
 
     def __repr__(self):
@@ -51,8 +51,20 @@ class Node:
         self._previous = previous
 
 
-def choose_node(nodes):
-    return nodes[0]
+def choose_node(nodes, dst_node: Node):
+    min_cost = INFINITY
+    best_node = None
+
+    for node in nodes:
+        cost_start_to_node = node.get_cost()
+        cost_node_to_goal = get_distance(node.x(), node.y(), dst_node.x(), dst_node.y())
+        total_cost = cost_start_to_node + cost_node_to_goal
+
+        if min_cost > total_cost:
+            min_cost = total_cost
+            best_node = node
+
+    return best_node
 
 
 def to_nodes(cells, cost):
@@ -76,7 +88,7 @@ class AStar:
         explored = []
 
         while len(reachable) > 0:
-            node = choose_node(reachable)
+            node = choose_node(reachable, dst_node)
             if node == dst_node:
                 return
 
@@ -84,7 +96,7 @@ class AStar:
             explored.append(node)
 
             cells = board.get_cell_neighbors(node.x(), node.y(), exclude_players=[opponent])
-            new_reachable = [n for n in filter(lambda n: n not in explored, to_nodes(cells, INFINITE))]
+            new_reachable = [n for n in filter(lambda n: n not in explored, to_nodes(cells, INFINITY))]
 
             next_cost = node.get_cost() + 1
             for adjacent in new_reachable:

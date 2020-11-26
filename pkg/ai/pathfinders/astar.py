@@ -6,7 +6,7 @@ class Node:
     _id: int = None
     _x: int = None
     _y: int = None
-    _cost = None
+    _cost = 0
     _previous = None
 
     def __init__(self, x, y):
@@ -49,6 +49,10 @@ def choose_node(nodes):
     return nodes[0]
 
 
+def to_nodes(cells):
+    return [Node(x, y) for (x, y) in cells]
+
+
 class AStar:
     _board: Board = None
 
@@ -60,19 +64,20 @@ class AStar:
 
     def find_path(self, for_player, src_x, src_y, dst_x, dst_y):
         board = self._board
-        goal_node = Node(dst_x, dst_y)
+        dst_node = Node(dst_x, dst_y)
         opponent = PLAYER_ONE if for_player == PLAYER_TWO else PLAYER_TWO
         reachable = [Node(src_x, src_y)]
         explored = []
         while len(reachable) > 0:
             node = choose_node(reachable)
-            if node == goal_node:
+            if node == dst_node:
                 return
 
             reachable.remove(node)
             explored.append(node)
-            new_reachable = [Node(x, y) for (x, y) in board.get_cell_neighbors(node.x(), node.y(), [opponent])]
-            new_reachable = [n for n in filter(lambda n: n not in explored, new_reachable)]
+
+            cells = board.get_cell_neighbors(node.x(), node.y(), exclude_players=[opponent])
+            new_reachable = [n for n in filter(lambda n: n not in explored, to_nodes(cells))]
 
             for adjacent in new_reachable:
                 if adjacent not in reachable:

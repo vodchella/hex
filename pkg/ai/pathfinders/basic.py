@@ -20,6 +20,8 @@ class BasicPathfinder:
     _choose_node_fn = None
 
     def __init__(self, board, choose_node_fn):
+        if type(self) == BasicPathfinder:
+            raise Exception('Can\'t instantiate BasicPathfinder')
         self._board = board
         self._choose_node_fn = choose_node_fn
 

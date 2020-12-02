@@ -46,3 +46,7 @@ class Node:
 
     def set_previous(self, previous):
         self._previous = previous
+
+
+def to_nodes(cells, cost):
+    return [Node(x, y, cost=cost) for (x, y) in cells]

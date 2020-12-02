@@ -1,4 +1,4 @@
-from pkg.ai.pathfinders import Node, INFINITY
+from pkg.ai.pathfinders import Node, INFINITY, to_nodes
 from pkg.constants.game import PLAYER_ONE, PLAYER_TWO
 from pkg.models.board import Board
 
@@ -9,10 +9,6 @@ def build_path(to_node: Node):
         path.append((to_node.x(), to_node.y()))
         to_node = to_node.get_previous()
     return path
-
-
-def to_nodes(cells, cost):
-    return [Node(x, y, cost=cost) for (x, y) in cells]
 
 
 class BasicPathfinder:

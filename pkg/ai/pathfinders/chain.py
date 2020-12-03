@@ -5,8 +5,15 @@ from pkg.utils.hex import get_distance
 
 
 class ChainPathfinder(BasicPathfinder):
+    _chains = {}
+
     def __init__(self, board):
         super().__init__(board)
+        self._chains = {
+            PLAYER_ONE: [(i, c) for i, c in enumerate(self._find_chains(PLAYER_ONE))],
+            PLAYER_TWO: [(i, c) for i, c in enumerate(self._find_chains(PLAYER_TWO))],
+        }
+        pass
 
     def _find_chains(self, for_player):
         result = []
@@ -57,7 +64,6 @@ class ChainPathfinder(BasicPathfinder):
         return best_node
 
     def find_path(self, for_player, src_x, src_y, dst_x, dst_y):
-        print(self._find_chains(for_player))
         board = self._board
         path = super().find_path(for_player, src_x, src_y, dst_x, dst_y)
         return [(x, y) for (x, y) in filter(lambda c: board.get_cell(c[0], c[1]) == PLAYER_NONE, path)]

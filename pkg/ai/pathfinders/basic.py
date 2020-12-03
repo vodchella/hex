@@ -1,4 +1,4 @@
-from pkg.ai.pathfinders import Node, INFINITY, to_nodes
+from pkg.ai.pathfinders import Node, to_nodes
 from pkg.constants.game import PLAYER_ONE, PLAYER_TWO
 from pkg.models.board import Board
 
@@ -13,13 +13,14 @@ def build_path(to_node: Node):
 
 class BasicPathfinder:
     _board: Board = None
-    _choose_node_fn = None
 
-    def __init__(self, board, choose_node_fn):
+    def __init__(self, board):
         if type(self) == BasicPathfinder:
             raise Exception('Can\'t instantiate BasicPathfinder')
         self._board = board
-        self._choose_node_fn = choose_node_fn
+
+    def choose_node(self, nodes, dst_node: Node):
+        return nodes[0]
 
     def find_path(self, for_player, src_x, src_y, dst_x, dst_y):
         board = self._board
@@ -29,7 +30,7 @@ class BasicPathfinder:
         explored = []
 
         while len(reachable) > 0:
-            node = self._choose_node_fn(board, reachable, dst_node)
+            node = self.choose_node(reachable, dst_node)
             if node == dst_node:
                 return build_path(node)
 

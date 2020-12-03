@@ -5,7 +5,7 @@ from pkg.views.console_board_view import ConsoleBoardView
 
 if __name__ == '__main__':
     board = Board(7, 7)
-    # board.set_cell(4, 0, PLAYER_ONE)
+
     board.set_cell(3, 0, PLAYER_ONE)
     board.set_cell(2, 1, PLAYER_ONE)
     board.set_cell(1, 3, PLAYER_ONE)

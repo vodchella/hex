@@ -138,13 +138,19 @@ class ChainPathfinder(BasicPathfinder):
         from_node = Node(src_x, src_y)
         to_node = Node(dst_x, dst_y)
 
+        simple_path = self._astar.find_path(for_player, src_x, src_y, dst_x, dst_y)
+
         src_chain_id, src_path, _ = self._find_nearest_chain_to_node(for_player, from_node)
         dst_chain_id, dst_path, _ = self._find_nearest_chain_to_node(for_player, to_node)
 
-        if src_chain_id == dst_chain_id:
-            return [from_node.tuple()] + src_path + dst_path + [to_node.tuple()]
+        if src_chain_id is not None and dst_chain_id is not None:
+            if src_chain_id == dst_chain_id:
+                path = [from_node.tuple()] + src_path + dst_path + [to_node.tuple()]
+                return path if len(path) < len(simple_path) else simple_path
+            else:
+                pass
         else:
-            pass
+            return simple_path
 
         path = super().find_path(for_player, src_x, src_y, dst_x, dst_y)
         return [(x, y) for (x, y) in filter(lambda c: board.get_cell(c[0], c[1]) == PLAYER_NONE, path)]

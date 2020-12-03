@@ -37,7 +37,7 @@ class BasicPathfinder:
             explored.append(node)
 
             cells = board.get_cell_neighbors(node.x(), node.y(), exclude_players=[opponent])
-            new_reachable = [n for n in filter(lambda n: n not in explored, to_nodes(cells, INFINITY))]
+            new_reachable = [n for n in filter(lambda n: n not in explored, to_nodes(cells))]
 
             next_cost = node.get_cost() + 1
             for adjacent in new_reachable:

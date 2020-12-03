@@ -50,7 +50,7 @@ class ChainPathfinder(BasicPathfinder):
                             explored.append(node)
                             chain.append(node)
                             cells = board.get_cell_neighbors(node.x(), node.y(), [opponent, PLAYER_NONE])
-                            new_reachable = [n for n in filter(lambda n: n not in explored, to_nodes(cells, INFINITY))]
+                            new_reachable = [n for n in filter(lambda n: n not in explored, to_nodes(cells))]
                             for adjacent in new_reachable:
                                 if adjacent not in reachable:
                                     reachable.append(adjacent)

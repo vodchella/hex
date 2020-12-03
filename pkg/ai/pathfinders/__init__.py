@@ -48,5 +48,5 @@ class Node:
         self._previous = previous
 
 
-def to_nodes(cells, cost):
+def to_nodes(cells, cost=INFINITY):
     return [Node(x, y, cost=cost) for (x, y) in cells]

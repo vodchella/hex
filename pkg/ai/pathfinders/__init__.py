@@ -40,6 +40,9 @@ class Node:
     def y(self):
         return self._y
 
+    def tuple(self):
+        return self._x, self._y
+
     def get_cost(self):
         return self._cost
 

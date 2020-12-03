@@ -95,6 +95,24 @@ class ChainPathfinder(BasicPathfinder):
                 best_node = to_node
         return shortest_path[1:-1], best_node
 
+    def _find_nearest_chain_to_node(self, for_player, node):
+        shortest_path_len = INFINITY
+        shortest_path = []
+        best_node = None
+        best_chain_id = None
+        chains = self._chains[for_player]
+        for i, chain in chains:
+            path, dst_node = self._find_path_from_node_to_chain(for_player, node, chain)
+            if dst_node is None:
+                break
+            path_len = len(path)
+            if path_len < shortest_path_len:
+                shortest_path_len = path_len
+                shortest_path = path
+                best_node = dst_node
+                best_chain_id = i
+        return best_chain_id, shortest_path, best_node
+
     def choose_node(self, nodes, dst_node: Node):
         min_cost = INFINITY
         best_node = None
@@ -117,5 +135,16 @@ class ChainPathfinder(BasicPathfinder):
 
     def find_path(self, for_player, src_x, src_y, dst_x, dst_y):
         board = self._board
+        from_node = Node(src_x, src_y)
+        to_node = Node(dst_x, dst_y)
+
+        src_chain_id, src_path, _ = self._find_nearest_chain_to_node(for_player, from_node)
+        dst_chain_id, dst_path, _ = self._find_nearest_chain_to_node(for_player, to_node)
+
+        if src_chain_id == dst_chain_id:
+            return [from_node.tuple()] + src_path + dst_path + [to_node.tuple()]
+        else:
+            pass
+
         path = super().find_path(for_player, src_x, src_y, dst_x, dst_y)
         return [(x, y) for (x, y) in filter(lambda c: board.get_cell(c[0], c[1]) == PLAYER_NONE, path)]

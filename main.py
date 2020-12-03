@@ -5,7 +5,7 @@ from pkg.views.console_board_view import ConsoleBoardView
 
 if __name__ == '__main__':
     board = Board(7, 7)
-    board.set_cell(4, 0, PLAYER_ONE)
+    # board.set_cell(4, 0, PLAYER_ONE)
     board.set_cell(3, 0, PLAYER_ONE)
     board.set_cell(2, 1, PLAYER_ONE)
     board.set_cell(1, 3, PLAYER_ONE)
@@ -23,6 +23,9 @@ if __name__ == '__main__':
 
     board.set_cell(5, 2, PLAYER_TWO)
     board.set_cell(6, 2, PLAYER_TWO)
+
+    board.set_cell(1, 2, PLAYER_ONE)
+    board.set_cell(3, 4, PLAYER_ONE)
 
     pf = ChainPathfinder(board)
     path = pf.find_path(PLAYER_ONE, 6, 0, 6, 6)

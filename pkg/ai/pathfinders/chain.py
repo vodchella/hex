@@ -13,7 +13,6 @@ class ChainPathfinder(BasicPathfinder):
             PLAYER_ONE: [(i, c) for i, c in enumerate(self._find_chains(PLAYER_ONE))],
             PLAYER_TWO: [(i, c) for i, c in enumerate(self._find_chains(PLAYER_TWO))],
         }
-        pass
 
     def _find_chains(self, for_player):
         result = []

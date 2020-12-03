@@ -54,7 +54,8 @@ class ChainPathfinder(BasicPathfinder):
                             for adjacent in new_reachable:
                                 if adjacent not in reachable:
                                     reachable.append(adjacent)
-                        result.append(chain)
+                        if len(chain):
+                            result.append(chain)
         return result
 
     def find_path(self, for_player, src_x, src_y, dst_x, dst_y):

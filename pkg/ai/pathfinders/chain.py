@@ -1,8 +1,8 @@
+from functools import reduce
 from pkg.ai.pathfinders import Node, INFINITY, to_nodes
 from pkg.ai.pathfinders.astar import AStarPathfinder
 from pkg.ai.pathfinders.basic import BasicPathfinder
 from pkg.constants.game import PLAYER_NONE, PLAYER_ONE, PLAYER_TWO
-from pkg.utils.hex import get_distance
 
 
 class ChainPathfinder(BasicPathfinder):
@@ -113,28 +113,32 @@ class ChainPathfinder(BasicPathfinder):
                 best_chain_id = i
         return best_chain_id, shortest_path, best_node
 
-    def choose_node(self, nodes, dst_node: Node):
-        min_cost = INFINITY
-        best_node = None
-
-        for node in nodes:
-            player = self._board.get_cell(node.x(), node.y())
-            if player != PLAYER_NONE:
-                total_cost = 0
-                node.set_cost(0)
+    def _find_paths_between_chains(self, for_player, src_chain_id, dst_chain_id):
+        def recursive(c_path):
+            if c_path[1] == dst_chain_id:
+                return [c_path]
             else:
-                cost_start_to_node = node.get_cost()
-                cost_node_to_goal = get_distance(node.x(), node.y(), dst_node.x(), dst_node.y())
-                total_cost = cost_start_to_node + cost_node_to_goal
+                r = [c_path]
+                s_paths = [p for p in filter(lambda cp: cp[0] == c_path[1], chain_paths)]
+                for sp in s_paths:
+                    r += recursive(sp)
+                return r
 
-            if min_cost > total_cost:
-                min_cost = total_cost
-                best_node = node
+        shortest_path_len = INFINITY
+        shortest_path = []
+        chain_paths = self._chain_paths[for_player]
+        starting_paths = [p for p in filter(lambda cp: cp[0] == src_chain_id, chain_paths)]
+        for chain_path in starting_paths:
+            path = recursive(chain_path)
+            do_reduce = len(path) > 1
+            path_len = reduce(lambda a, b: len(a[2]) + len(b[2]), path) if do_reduce else len(path[0][2])
+            if path_len < shortest_path_len:
+                shortest_path_len = path_len
+                shortest_path = reduce(lambda a, b: a[2] + b[2], path) if do_reduce else path[0][2]
 
-        return best_node
+        return shortest_path
 
     def find_path(self, for_player, src_x, src_y, dst_x, dst_y):
-        board = self._board
         from_node = Node(src_x, src_y)
         to_node = Node(dst_x, dst_y)
 
@@ -146,11 +150,9 @@ class ChainPathfinder(BasicPathfinder):
         if src_chain_id is not None and dst_chain_id is not None:
             if src_chain_id == dst_chain_id:
                 path = [from_node.tuple()] + src_path + dst_path + [to_node.tuple()]
-                return path if len(path) < len(simple_path) else simple_path
             else:
-                pass
+                path = self._find_paths_between_chains(for_player, src_chain_id, dst_chain_id)
+                path = [from_node.tuple()] + src_path + path + dst_path + [to_node.tuple()]
+            return path if len(path) < len(simple_path) else simple_path
         else:
             return simple_path
-
-        path = super().find_path(for_player, src_x, src_y, dst_x, dst_y)
-        return [(x, y) for (x, y) in filter(lambda c: board.get_cell(c[0], c[1]) == PLAYER_NONE, path)]

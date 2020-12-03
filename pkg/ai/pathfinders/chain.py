@@ -66,20 +66,34 @@ class ChainPathfinder(BasicPathfinder):
     def _find_path_between_two_chains(self, for_player, chain_from, chain_to):
         shortest_path_len = INFINITY
         shortest_path = []
-        best_node_from = None
-        best_node_to = None
-        for node_from in chain_from:
-            for node_to in chain_to:
-                path = self._astar.find_path(for_player, node_from.x(), node_from.y(), node_to.x(), node_to.y())
-                path_len = len(path)
-                if path_len == 0:
-                    break
-                if path_len < shortest_path_len:
-                    shortest_path_len = path_len
-                    shortest_path = path
-                    best_node_from = node_from
-                    best_node_to = node_to
-        return shortest_path[1:-1], best_node_from, best_node_to
+        best_from_node = None
+        best_to_node = None
+        for from_node in chain_from:
+            path, best_node = self._find_path_from_node_to_chain(for_player, from_node, chain_to)
+            path_len = len(path)
+            if path_len == 0:
+                break
+            if path_len < shortest_path_len:
+                shortest_path_len = path_len
+                shortest_path = path
+                best_from_node = from_node
+                best_to_node = best_node
+        return shortest_path, best_from_node, best_to_node
+
+    def _find_path_from_node_to_chain(self, for_player, from_node, to_chain):
+        shortest_path_len = INFINITY
+        shortest_path = []
+        best_node = None
+        for to_node in to_chain:
+            path = self._astar.find_path(for_player, from_node.x(), from_node.y(), to_node.x(), to_node.y())
+            path_len = len(path)
+            if path_len == 0:
+                break
+            if path_len < shortest_path_len:
+                shortest_path_len = path_len
+                shortest_path = path
+                best_node = to_node
+        return shortest_path[1:-1], best_node
 
     def choose_node(self, nodes, dst_node: Node):
         min_cost = INFINITY

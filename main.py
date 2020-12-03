@@ -21,6 +21,9 @@ if __name__ == '__main__':
     board.set_cell(1, 5, PLAYER_TWO)
     board.set_cell(1, 6, PLAYER_TWO)
 
+    board.set_cell(5, 2, PLAYER_TWO)
+    board.set_cell(6, 2, PLAYER_TWO)
+
     pf = ChainPathfinder(board)
     path = pf.find_path(PLAYER_ONE, 6, 0, 6, 6)
     board.set_cells(path, PLAYER_VIRTUAL)

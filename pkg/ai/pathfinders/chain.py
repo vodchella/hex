@@ -113,7 +113,7 @@ class ChainPathfinder(BasicPathfinder):
                 best_chain_id = i
         return best_chain_id, shortest_path, best_node
 
-    def _find_paths_between_chains(self, for_player, src_chain_id, dst_chain_id):
+    def _find_path_between_chains(self, for_player, src_chain_id, dst_chain_id):
         def recursive(c_path):
             if c_path[1] == dst_chain_id:
                 return [c_path]
@@ -151,7 +151,7 @@ class ChainPathfinder(BasicPathfinder):
             if src_chain_id == dst_chain_id:
                 path = [from_node.tuple()] + src_path + dst_path + [to_node.tuple()]
             else:
-                path = self._find_paths_between_chains(for_player, src_chain_id, dst_chain_id)
+                path = self._find_path_between_chains(for_player, src_chain_id, dst_chain_id)
                 path = [from_node.tuple()] + src_path + path + dst_path + [to_node.tuple()]
             return path if len(path) < len(simple_path) else simple_path
         else:

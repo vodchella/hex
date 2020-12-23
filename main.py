@@ -24,8 +24,8 @@ if __name__ == '__main__':
     board.set_cell(5, 2, PLAYER_TWO)
     board.set_cell(6, 2, PLAYER_TWO)
 
-    # board.set_cell(1, 2, PLAYER_ONE)
-    # board.set_cell(3, 4, PLAYER_ONE)
+    board.set_cell(2, 2, PLAYER_TWO)
+    board.set_cell(1, 2, PLAYER_TWO)
 
     pf = ChainPathfinder(board)
     path = pf.find_path(PLAYER_ONE, 6, 0, 6, 6)

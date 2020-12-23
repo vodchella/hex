@@ -9,7 +9,10 @@ from pkg.utils.paths import merge_paths
 class ChainPathfinder(BasicPathfinder):
     _astar: AStarPathfinder = None
     _chains = {}
-    _chain_paths = {}
+    _chain_paths = {
+        PLAYER_ONE: [],
+        PLAYER_TWO: [],
+    }
 
     def __init__(self, board):
         super().__init__(board)
@@ -17,10 +20,6 @@ class ChainPathfinder(BasicPathfinder):
         self._chains = {
             PLAYER_ONE: [(i, c) for i, c in enumerate(self._find_chains(PLAYER_ONE))],
             PLAYER_TWO: [(i, c) for i, c in enumerate(self._find_chains(PLAYER_TWO))],
-        }
-        self._chain_paths = {
-            PLAYER_ONE: self._find_paths_between_all_chains(PLAYER_ONE),
-            PLAYER_TWO: self._find_paths_between_all_chains(PLAYER_TWO),
         }
 
     def _find_chains(self, for_player):
@@ -142,6 +141,8 @@ class ChainPathfinder(BasicPathfinder):
     def find_path(self, for_player, src_x, src_y, dst_x, dst_y):
         from_node = Node(src_x, src_y)
         to_node = Node(dst_x, dst_y)
+
+        self._chain_paths[for_player] = self._find_paths_between_all_chains(for_player)
 
         shortest_path = self._astar.find_path(for_player, src_x, src_y, dst_x, dst_y)
         if len(shortest_path) > 2:

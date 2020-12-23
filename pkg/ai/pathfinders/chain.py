@@ -8,6 +8,7 @@ from pkg.utils.paths import merge_paths
 
 class ChainPathfinder(BasicPathfinder):
     _for_player = None
+    _dst_node = None
     _astar: AStarPathfinder = None
     _chains = {
         PLAYER_ONE: [],
@@ -82,17 +83,41 @@ class ChainPathfinder(BasicPathfinder):
 
     def _find_path_from_node_to_chain(self, from_node, to_chain):
         shortest_path_len = INFINITY
+        shortest_path_to_dst_len = INFINITY
         shortest_path = []
         best_node = None
         for to_node in to_chain:
-            path = self._astar.find_path(self._for_player, from_node.x(), from_node.y(), to_node.x(), to_node.y())
+            path = self._astar.find_path(
+                self._for_player,
+                from_node.x(),
+                from_node.y(),
+                to_node.x(),
+                to_node.y()
+            )
             path_len = len(path)
             if path_len == 0:
                 break
-            if path_len < shortest_path_len:
-                shortest_path_len = path_len
-                shortest_path = path
-                best_node = to_node
+            if path_len <= shortest_path_len:
+                the_best = True
+                path_to_dst = self._astar.find_path(
+                    self._for_player,
+                    to_node.x(),
+                    to_node.y(),
+                    self._dst_node.x(),
+                    self._dst_node.y()
+                )
+                path_to_dst_len = len(path_to_dst)
+                if path_to_dst_len > 0:
+                    if path_to_dst_len < shortest_path_to_dst_len:
+                        shortest_path_to_dst_len = path_to_dst_len
+                    else:
+                        the_best = False
+
+                if the_best:
+                    shortest_path_len = path_len
+                    shortest_path = path
+                    best_node = to_node
+
         return shortest_path[1:-1], best_node
 
     def _find_path_between_chains(self, src_chain_id: int, dst_chain_id: int):
@@ -121,12 +146,13 @@ class ChainPathfinder(BasicPathfinder):
         return shortest_path
 
     def find_path(self, for_player, src_x, src_y, dst_x, dst_y):
+        from_node = Node(src_x, src_y)
+        to_node = Node(dst_x, dst_y)
+
+        self._dst_node = to_node
         self._for_player = for_player
         self._chains[for_player] = [(i, c) for i, c in enumerate(self._find_chains())]
         self._chain_paths[for_player] = self._find_paths_between_all_chains()
-
-        from_node = Node(src_x, src_y)
-        to_node = Node(dst_x, dst_y)
 
         shortest_path = self._astar.find_path(for_player, src_x, src_y, dst_x, dst_y)
         if len(shortest_path) > 2:

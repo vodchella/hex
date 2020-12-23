@@ -3,7 +3,7 @@ from pkg.ai.pathfinders import Node, INFINITY, to_nodes
 from pkg.ai.pathfinders.astar import AStarPathfinder
 from pkg.ai.pathfinders.basic import BasicPathfinder
 from pkg.constants.game import PLAYER_NONE, PLAYER_ONE, PLAYER_TWO
-from pkg.utils import merge_paths
+from pkg.utils.paths import merge_paths
 
 
 class ChainPathfinder(BasicPathfinder):

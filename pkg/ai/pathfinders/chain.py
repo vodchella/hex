@@ -7,8 +7,12 @@ from pkg.utils.paths import merge_paths
 
 
 class ChainPathfinder(BasicPathfinder):
+    _for_player = None
     _astar: AStarPathfinder = None
-    _chains = {}
+    _chains = {
+        PLAYER_ONE: [],
+        PLAYER_TWO: [],
+    }
     _chain_paths = {
         PLAYER_ONE: [],
         PLAYER_TWO: [],
@@ -17,14 +21,10 @@ class ChainPathfinder(BasicPathfinder):
     def __init__(self, board):
         super().__init__(board)
         self._astar = AStarPathfinder(board)
-        self._chains = {
-            PLAYER_ONE: [(i, c) for i, c in enumerate(self._find_chains(PLAYER_ONE))],
-            PLAYER_TWO: [(i, c) for i, c in enumerate(self._find_chains(PLAYER_TWO))],
-        }
 
-    def _find_chains(self, for_player):
+    def _find_chains(self):
         result = []
-        opponent = PLAYER_ONE if for_player == PLAYER_TWO else PLAYER_TWO
+        opponent = PLAYER_ONE if self._for_player == PLAYER_TWO else PLAYER_TWO
         explored = []
         board = self._board
         w, h = board.get_dimensions()
@@ -33,7 +33,7 @@ class ChainPathfinder(BasicPathfinder):
                 current_node = Node(x, y)
                 if current_node not in explored:
                     player = board.get_cell(x, y)
-                    if player == for_player:
+                    if player == self._for_player:
                         chain = []
                         reachable = [current_node]
                         while len(reachable) > 0:
@@ -50,26 +50,26 @@ class ChainPathfinder(BasicPathfinder):
                             result.append(chain)
         return result
 
-    def _find_paths_between_all_chains(self, for_player):
+    def _find_paths_between_all_chains(self):
         result = []
-        chains = self._chains[for_player]
+        chains = self._chains[self._for_player]
         if len(chains) > 1:
             processed = []
             for (i, chain_from) in chains:
                 processed.append(i)
                 for (j, chain_to) in filter(lambda c: c[0] not in processed, chains):
-                    path, node_from, node_to = self._find_path_between_two_chains(for_player, chain_from, chain_to)
+                    path, node_from, node_to = self._find_path_between_two_chains(chain_from, chain_to)
                     if len(path):
                         result.append((i, j, path, node_from, node_to))
         return result
 
-    def _find_path_between_two_chains(self, for_player, chain_from, chain_to):
+    def _find_path_between_two_chains(self, chain_from, chain_to):
         shortest_path_len = INFINITY
         shortest_path = []
         best_from_node = None
         best_to_node = None
         for from_node in chain_from:
-            path, best_node = self._find_path_from_node_to_chain(for_player, from_node, chain_to)
+            path, best_node = self._find_path_from_node_to_chain(from_node, chain_to)
             path_len = len(path)
             if path_len == 0:
                 break
@@ -80,12 +80,12 @@ class ChainPathfinder(BasicPathfinder):
                 best_to_node = best_node
         return shortest_path, best_from_node, best_to_node
 
-    def _find_path_from_node_to_chain(self, for_player, from_node, to_chain):
+    def _find_path_from_node_to_chain(self, from_node, to_chain):
         shortest_path_len = INFINITY
         shortest_path = []
         best_node = None
         for to_node in to_chain:
-            path = self._astar.find_path(for_player, from_node.x(), from_node.y(), to_node.x(), to_node.y())
+            path = self._astar.find_path(self._for_player, from_node.x(), from_node.y(), to_node.x(), to_node.y())
             path_len = len(path)
             if path_len == 0:
                 break
@@ -95,7 +95,7 @@ class ChainPathfinder(BasicPathfinder):
                 best_node = to_node
         return shortest_path[1:-1], best_node
 
-    def _find_path_between_chains(self, for_player, src_chain_id: int, dst_chain_id: int):
+    def _find_path_between_chains(self, src_chain_id: int, dst_chain_id: int):
         def recursive(c_path):
             if c_path[1] == dst_chain_id:
                 return [c_path]
@@ -108,7 +108,7 @@ class ChainPathfinder(BasicPathfinder):
 
         shortest_path_len = INFINITY
         shortest_path = []
-        chain_paths = self._chain_paths[for_player]
+        chain_paths = self._chain_paths[self._for_player]
         starting_paths = [p for p in filter(lambda cp: cp[0] == src_chain_id, chain_paths)]
         for chain_path in starting_paths:
             path = recursive(chain_path)
@@ -121,24 +121,26 @@ class ChainPathfinder(BasicPathfinder):
         return shortest_path
 
     def find_path(self, for_player, src_x, src_y, dst_x, dst_y):
+        self._for_player = for_player
+        self._chains[for_player] = [(i, c) for i, c in enumerate(self._find_chains())]
+        self._chain_paths[for_player] = self._find_paths_between_all_chains()
+
         from_node = Node(src_x, src_y)
         to_node = Node(dst_x, dst_y)
-
-        self._chain_paths[for_player] = self._find_paths_between_all_chains(for_player)
 
         shortest_path = self._astar.find_path(for_player, src_x, src_y, dst_x, dst_y)
         if len(shortest_path) > 2:
             chains = self._chains[for_player]
             for i1, chain1 in chains:
-                beg_path, n1 = self._find_path_from_node_to_chain(for_player, from_node, chain1)
+                beg_path, n1 = self._find_path_from_node_to_chain(from_node, chain1)
                 if n1 is not None:
                     for i2, chain2 in chains:
-                        end_path, n2 = self._find_path_from_node_to_chain(for_player, to_node, chain2)
+                        end_path, n2 = self._find_path_from_node_to_chain(to_node, chain2)
                         if n2 is not None:
                             if i1 == i2:
                                 path = merge_paths([from_node.tuple()], beg_path, end_path, [to_node.tuple()])
                             else:
-                                path = self._find_path_between_chains(for_player, i1, i2)
+                                path = self._find_path_between_chains(i1, i2)
                                 path = merge_paths([from_node.tuple()], beg_path, path, end_path, [to_node.tuple()])
                             if len(path) < len(shortest_path):
                                 shortest_path = path

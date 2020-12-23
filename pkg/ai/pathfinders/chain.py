@@ -95,24 +95,6 @@ class ChainPathfinder(BasicPathfinder):
                 best_node = to_node
         return shortest_path[1:-1], best_node
 
-    def _find_nearest_chain_to_node(self, for_player, node):
-        shortest_path_len = INFINITY
-        shortest_path = []
-        best_node = None
-        best_chain_id = None
-        chains = self._chains[for_player]
-        for i, chain in chains:
-            path, dst_node = self._find_path_from_node_to_chain(for_player, node, chain)
-            if dst_node is None:
-                break
-            path_len = len(path)
-            if path_len < shortest_path_len:
-                shortest_path_len = path_len
-                shortest_path = path
-                best_node = dst_node
-                best_chain_id = i
-        return best_chain_id, shortest_path, best_node
-
     def _find_path_between_chains(self, for_player, src_chain_id: int, dst_chain_id: int):
         def recursive(c_path):
             if c_path[1] == dst_chain_id:

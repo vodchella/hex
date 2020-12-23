@@ -1,38 +1,6 @@
-from pkg.ai.pathfinders import Node, to_nodes
 from pkg.ai.pathfinders.astar import AStarPathfinder
-from pkg.ai.pathfinders.basic import build_path
-from pkg.constants.game import PLAYER_ONE, PLAYER_TWO, PLAYER_NONE
 
 
 class WalkerPathfinder(AStarPathfinder):
     def __init__(self, board):
-        super().__init__(board)
-
-    def find_path(self, for_player, src_x, src_y, dst_x, dst_y):
-        board = self._board
-        dst_node = Node(dst_x, dst_y)
-        opponent = PLAYER_ONE if for_player == PLAYER_TWO else PLAYER_TWO
-        reachable = [Node(src_x, src_y)]
-        explored = []
-
-        while len(reachable) > 0:
-            node = self.choose_node(reachable, dst_node)
-            if node == dst_node:
-                return build_path(node)
-
-            reachable.remove(node)
-            explored.append(node)
-
-            cells = board.get_cell_neighbors(node.x(), node.y(), exclude_players=[opponent, PLAYER_NONE])
-            new_reachable = [n for n in filter(lambda n: n not in explored, to_nodes(cells))]
-
-            next_cost = node.get_cost() + 1
-            for adjacent in new_reachable:
-                if adjacent not in reachable:
-                    reachable.append(adjacent)
-
-                if next_cost < adjacent.get_cost():
-                    adjacent.set_previous(node)
-                    adjacent.set_cost(next_cost)
-
-        return []
+        super().__init__(board, walk_only_by_own_cells=True)

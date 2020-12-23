@@ -4,8 +4,8 @@ from pkg.utils.hex import get_distance
 
 
 class AStarPathfinder(BasicPathfinder):
-    def __init__(self, board):
-        super().__init__(board)
+    def __init__(self, board, walk_only_by_own_cells=False):
+        super().__init__(board, walk_only_by_own_cells=walk_only_by_own_cells)
 
     def choose_node(self, nodes, dst_node: Node):
         min_cost = INFINITY

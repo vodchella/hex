@@ -1,5 +1,5 @@
 from pkg.ai.pathfinders import Node, to_nodes
-from pkg.constants.game import PLAYER_ONE, PLAYER_TWO
+from pkg.constants.game import PLAYER_ONE, PLAYER_TWO, PLAYER_NONE
 from pkg.models.board import Board
 
 
@@ -13,11 +13,13 @@ def build_path(to_node: Node):
 
 class BasicPathfinder:
     _board: Board = None
+    _walk_only_by_own_cells: bool = False
 
-    def __init__(self, board):
+    def __init__(self, board, walk_only_by_own_cells=False):
         if type(self) == BasicPathfinder:
             raise Exception('Can\'t instantiate BasicPathfinder')
         self._board = board
+        self._walk_only_by_own_cells = walk_only_by_own_cells
 
     def choose_node(self, nodes, dst_node: Node):
         return nodes[0]
@@ -26,6 +28,7 @@ class BasicPathfinder:
         board = self._board
         dst_node = Node(dst_x, dst_y)
         opponent = PLAYER_ONE if for_player == PLAYER_TWO else PLAYER_TWO
+        exclude_players = [opponent, PLAYER_NONE] if self._walk_only_by_own_cells else [opponent]
         reachable = [Node(src_x, src_y)]
         explored = []
 
@@ -37,7 +40,7 @@ class BasicPathfinder:
             reachable.remove(node)
             explored.append(node)
 
-            cells = board.get_cell_neighbors(node.x(), node.y(), exclude_players=[opponent])
+            cells = board.get_cell_neighbors(node.x(), node.y(), exclude_players=exclude_players)
             new_reachable = [n for n in filter(lambda n: n not in explored, to_nodes(cells))]
 
             next_cost = node.get_cost() + 1

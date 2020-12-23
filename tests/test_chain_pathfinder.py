@@ -49,3 +49,14 @@ class TestChainPathfinder:
             path,
             [(6, 0), (4, 0), (5, 0), (1, 2), (3, 4), (6, 6)]
         )
+
+    def test_3(self):
+        board = Board(3, 3)
+        board.set_cell(0, 1, PLAYER_TWO)
+        board.set_cell(1, 1, PLAYER_TWO)
+        board.set_cell(2, 1, PLAYER_TWO)
+
+        pf = ChainPathfinder(board)
+        path = pf.find_path(PLAYER_ONE, 0, 0, 2, 2)
+
+        assert len(path) == 0

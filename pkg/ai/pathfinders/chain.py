@@ -144,20 +144,20 @@ class ChainPathfinder(BasicPathfinder):
         to_node = Node(dst_x, dst_y)
 
         shortest_path = self._astar.find_path(for_player, src_x, src_y, dst_x, dst_y)
-
-        chains = self._chains[for_player]
-        for i1, chain1 in chains:
-            beg_path, n1 = self._find_path_from_node_to_chain(for_player, from_node, chain1)
-            if n1 is not None:
-                for i2, chain2 in chains:
-                    end_path, n2 = self._find_path_from_node_to_chain(for_player, to_node, chain2)
-                    if n2 is not None:
-                        if i1 == i2:
-                            path = merge_paths([from_node.tuple()], beg_path, end_path, [to_node.tuple()])
-                        else:
-                            path = self._find_path_between_chains(for_player, i1, i2)
-                            path = merge_paths([from_node.tuple()], beg_path, path, end_path, [to_node.tuple()])
-                        if len(path) < len(shortest_path):
-                            shortest_path = path
+        if len(shortest_path) > 2:
+            chains = self._chains[for_player]
+            for i1, chain1 in chains:
+                beg_path, n1 = self._find_path_from_node_to_chain(for_player, from_node, chain1)
+                if n1 is not None:
+                    for i2, chain2 in chains:
+                        end_path, n2 = self._find_path_from_node_to_chain(for_player, to_node, chain2)
+                        if n2 is not None:
+                            if i1 == i2:
+                                path = merge_paths([from_node.tuple()], beg_path, end_path, [to_node.tuple()])
+                            else:
+                                path = self._find_path_between_chains(for_player, i1, i2)
+                                path = merge_paths([from_node.tuple()], beg_path, path, end_path, [to_node.tuple()])
+                            if len(path) < len(shortest_path):
+                                shortest_path = path
 
         return shortest_path

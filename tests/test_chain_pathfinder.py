@@ -82,3 +82,23 @@ class TestChainPathfinder:
             path,
             [(6, 0), (4, 4), (4, 3), (6, 6)]
         )
+
+    def test_5(self):
+        board = Board(7, 7)
+        board.set_cell(5, 3, PLAYER_ONE)
+        board.set_cell(6, 3, PLAYER_ONE)
+        board.set_cell(6, 4, PLAYER_ONE)
+
+        pf = ChainPathfinder(board)
+
+        path = pf.find_path(PLAYER_ONE, 6, 0, 6, 6, full=True)
+        assert compare_paths(
+            path,
+            [(6, 6), (6, 5), (6, 4), (6, 3), (6, 2), (6, 1), (6, 0)]
+        )
+
+        path = pf.find_path(PLAYER_ONE, 6, 0, 6, 6)
+        assert compare_paths(
+            path,
+            [(6, 0), (6, 2), (6, 1), (6, 5), (6, 6)]
+        )

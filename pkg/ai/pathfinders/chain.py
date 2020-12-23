@@ -145,7 +145,7 @@ class ChainPathfinder(BasicPathfinder):
 
         return shortest_path
 
-    def find_path(self, for_player, src_x, src_y, dst_x, dst_y):
+    def find_path(self, for_player, src_x, src_y, dst_x, dst_y, full=False):
         from_node = Node(src_x, src_y)
         to_node = Node(dst_x, dst_y)
 
@@ -164,7 +164,20 @@ class ChainPathfinder(BasicPathfinder):
                         end_path, n2 = self._find_path_from_node_to_chain(to_node, chain2)
                         if n2 is not None:
                             if i1 == i2:
-                                path = merge_paths([from_node.tuple()], beg_path, end_path, [to_node.tuple()])
+                                filled = self._astar.find_path(
+                                    self._for_player,
+                                    n1.x(),
+                                    n1.y(),
+                                    n2.x(),
+                                    n2.y()
+                                ) if full else []
+                                path = merge_paths(
+                                    [from_node.tuple()],
+                                    beg_path,
+                                    filled,
+                                    end_path,
+                                    [to_node.tuple()]
+                                )
                             else:
                                 path = self._find_path_between_chains(i1, i2)
                                 path = merge_paths([from_node.tuple()], beg_path, path, end_path, [to_node.tuple()])

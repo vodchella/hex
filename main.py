@@ -16,7 +16,8 @@ if __name__ == '__main__':
     board.set_cell(6, 4, PLAYER_ONE)
 
     pf = ChainPathfinder(board)
-    path = pf.find_path(PLAYER_ONE, 0, 0, 6, 6, full=True)
+    paths = pf.find_path(PLAYER_ONE, 0, 0, 6, 6)
+    path = paths['path']
     board.set_cells(path, PLAYER_VIRTUAL)
 
     c_view = ConsoleBoardView(board)

@@ -148,7 +148,7 @@ class ChainPathfinder(BasicPathfinder):
 
         return shortest_path
 
-    def find_path(self, for_player, src_x, src_y, dst_x, dst_y, full=False):
+    def find_path(self, for_player, src_x, src_y, dst_x, dst_y):
         from_node = Node(src_x, src_y)
         to_node = Node(dst_x, dst_y)
 
@@ -158,6 +158,7 @@ class ChainPathfinder(BasicPathfinder):
         self._chain_paths[for_player] = self._find_paths_between_all_chains()
 
         shortest_path_with_one_chain = True
+        shortest_full_path = []
         shortest_path = self._astar.find_path(for_player, src_x, src_y, dst_x, dst_y)
         if len(shortest_path) > 2:
             chains = self._chains[for_player]
@@ -173,19 +174,25 @@ class ChainPathfinder(BasicPathfinder):
                                     self._for_player,
                                     n1.x(), n1.y(),
                                     n2.x(), n2.y()
-                                ) if full else []
-                                path = merge_paths([from_node.tuple()], beg_path, filled, end_path, [to_node.tuple()])
+                                )
+                                path = merge_paths([from_node.tuple()], beg_path, end_path, [to_node.tuple()])
+                                full = merge_paths([from_node.tuple()], beg_path, filled, end_path, [to_node.tuple()])
                             else:
                                 path = self._find_path_between_chains(i1, i2)
                                 path = merge_paths([from_node.tuple()], beg_path, path, end_path, [to_node.tuple()])
+                                full = []
                             if len(path) <= len(shortest_path):
                                 shortest_path = path
+                                shortest_full_path = full
                                 shortest_path_with_one_chain = path_with_one_chain
 
-        if full and not shortest_path_with_one_chain:
+        if not shortest_path_with_one_chain:
             board = self._board.copy(check_bounds=False)
             board.set_cells(shortest_path, for_player)
             pf = WalkerPathfinder(board)
-            return pf.find_path(for_player, src_x, src_y, dst_x, dst_y)
-        else:
-            return shortest_path
+            shortest_full_path = pf.find_path(for_player, src_x, src_y, dst_x, dst_y)
+
+        return {
+            'path': shortest_path,
+            'full': shortest_full_path,
+        }

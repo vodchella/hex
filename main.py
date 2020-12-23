@@ -1,5 +1,5 @@
 from pkg.ai.pathfinders.chain import ChainPathfinder
-from pkg.constants.game import PLAYER_ONE, PLAYER_VIRTUAL, PLAYER_TWO
+from pkg.constants.game import PLAYER_ONE, PLAYER_VIRTUAL
 from pkg.models.board import Board
 from pkg.views.console_board_view import ConsoleBoardView
 

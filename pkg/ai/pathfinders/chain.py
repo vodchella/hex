@@ -2,6 +2,7 @@ from functools import reduce
 from pkg.ai.pathfinders import Node, INFINITY, to_nodes
 from pkg.ai.pathfinders.astar import AStarPathfinder
 from pkg.ai.pathfinders.basic import BasicPathfinder
+from pkg.ai.pathfinders.walker import WalkerPathfinder
 from pkg.constants.game import PLAYER_NONE, PLAYER_ONE, PLAYER_TWO
 from pkg.utils.paths import merge_paths
 
@@ -10,6 +11,7 @@ class ChainPathfinder(BasicPathfinder):
     _for_player = None
     _dst_node = None
     _astar: AStarPathfinder = None
+    _walker: WalkerPathfinder = None
     _chains = {
         PLAYER_ONE: [],
         PLAYER_TWO: [],
@@ -22,6 +24,7 @@ class ChainPathfinder(BasicPathfinder):
     def __init__(self, board):
         super().__init__(board)
         self._astar = AStarPathfinder(board)
+        self._walker = WalkerPathfinder(board)
 
     def _find_chains(self):
         result = []
@@ -154,6 +157,7 @@ class ChainPathfinder(BasicPathfinder):
         self._chains[for_player] = [(i, c) for i, c in enumerate(self._find_chains())]
         self._chain_paths[for_player] = self._find_paths_between_all_chains()
 
+        shortest_path_with_one_chain = True
         shortest_path = self._astar.find_path(for_player, src_x, src_y, dst_x, dst_y)
         if len(shortest_path) > 2:
             chains = self._chains[for_player]
@@ -163,25 +167,25 @@ class ChainPathfinder(BasicPathfinder):
                     for i2, chain2 in chains:
                         end_path, n2 = self._find_path_from_node_to_chain(to_node, chain2)
                         if n2 is not None:
-                            if i1 == i2:
-                                filled = self._astar.find_path(
+                            path_with_one_chain = i1 == i2
+                            if path_with_one_chain:
+                                filled = self._walker.find_path(
                                     self._for_player,
-                                    n1.x(),
-                                    n1.y(),
-                                    n2.x(),
-                                    n2.y()
+                                    n1.x(), n1.y(),
+                                    n2.x(), n2.y()
                                 ) if full else []
-                                path = merge_paths(
-                                    [from_node.tuple()],
-                                    beg_path,
-                                    filled,
-                                    end_path,
-                                    [to_node.tuple()]
-                                )
+                                path = merge_paths([from_node.tuple()], beg_path, filled, end_path, [to_node.tuple()])
                             else:
                                 path = self._find_path_between_chains(i1, i2)
                                 path = merge_paths([from_node.tuple()], beg_path, path, end_path, [to_node.tuple()])
-                            if len(path) < len(shortest_path):
+                            if len(path) <= len(shortest_path):
                                 shortest_path = path
+                                shortest_path_with_one_chain = path_with_one_chain
 
-        return shortest_path
+        if full and not shortest_path_with_one_chain:
+            board = self._board.copy(check_bounds=False)
+            board.set_cells(shortest_path, for_player)
+            pf = WalkerPathfinder(board)
+            return pf.find_path(for_player, src_x, src_y, dst_x, dst_y)
+        else:
+            return shortest_path

@@ -38,11 +38,12 @@ class TestChainPathfinder:
 
         assert compare_paths(
             path,
-            [(6, 0), (3, 3), (4, 2), (5, 1), (3, 4), (6, 6)]
+            [(6, 0), (4, 4), (4, 3), (4, 2), (5, 1), (6, 6)]
         )
 
     def test_2(self):
         board = _init_test_board()
+        board.set_cell(4, 0, PLAYER_ONE)
         board.set_cell(1, 2, PLAYER_NONE)
 
         pf = ChainPathfinder(board)
@@ -50,7 +51,7 @@ class TestChainPathfinder:
 
         assert compare_paths(
             path,
-            [(6, 0), (4, 0), (5, 0), (1, 2), (3, 4), (6, 6)]
+            [(6, 0), (5, 0), (1, 2), (3, 4), (6, 6)]
         )
 
     def test_3(self):

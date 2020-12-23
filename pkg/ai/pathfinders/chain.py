@@ -3,6 +3,7 @@ from pkg.ai.pathfinders import Node, INFINITY, to_nodes
 from pkg.ai.pathfinders.astar import AStarPathfinder
 from pkg.ai.pathfinders.basic import BasicPathfinder
 from pkg.constants.game import PLAYER_NONE, PLAYER_ONE, PLAYER_TWO
+from pkg.utils import merge_paths
 
 
 class ChainPathfinder(BasicPathfinder):
@@ -149,10 +150,10 @@ class ChainPathfinder(BasicPathfinder):
 
         if src_chain_id is not None and dst_chain_id is not None:
             if src_chain_id == dst_chain_id:
-                path = [from_node.tuple()] + src_path + dst_path + [to_node.tuple()]
+                path = merge_paths([from_node.tuple()], src_path, dst_path, [to_node.tuple()])
             else:
                 path = self._find_path_between_chains(for_player, src_chain_id, dst_chain_id)
-                path = [from_node.tuple()] + src_path + path + dst_path + [to_node.tuple()]
+                path = merge_paths([from_node.tuple()], src_path, path, dst_path, [to_node.tuple()])
             return path if len(path) < len(simple_path) else simple_path
         else:
             return simple_path

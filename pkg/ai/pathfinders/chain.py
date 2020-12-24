@@ -170,8 +170,8 @@ class ChainPathfinder(BasicPathfinder):
                             else:
                                 path = self._find_path_between_chains(i1, i2)
                                 path = merge_paths(beg_path, path, end_path)
+                            path = finalize_path(path)
                             if len(path) < len(shortest_path):
                                 shortest_path = path
-            shortest_path = finalize_path(shortest_path)
 
         return shortest_path

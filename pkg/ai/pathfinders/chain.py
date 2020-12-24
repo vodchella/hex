@@ -10,14 +10,8 @@ class ChainPathfinder(BasicPathfinder):
     _for_player = None
     _dst_node = None
     _astar: AStarPathfinder = None
-    _chains = {
-        PLAYER_ONE: [],
-        PLAYER_TWO: [],
-    }
-    _chain_paths = {
-        PLAYER_ONE: [],
-        PLAYER_TWO: [],
-    }
+    _chains = []
+    _chain_paths = []
 
     def __init__(self, board):
         super().__init__(board)
@@ -53,12 +47,11 @@ class ChainPathfinder(BasicPathfinder):
 
     def _find_paths_between_all_chains(self):
         result = []
-        chains = self._chains[self._for_player]
-        if len(chains) > 1:
+        if len(self._chains) > 1:
             processed = []
-            for (i, chain_from) in chains:
+            for (i, chain_from) in self._chains:
                 processed.append(i)
-                for (j, chain_to) in filter(lambda c: c[0] not in processed, chains):
+                for (j, chain_to) in filter(lambda c: c[0] not in processed, self._chains):
                     path, node_from, node_to = self._find_path_between_two_chains(chain_from, chain_to)
                     if len(path):
                         result.append((i, j, path, node_from, node_to))
@@ -126,15 +119,14 @@ class ChainPathfinder(BasicPathfinder):
                 return [c_path]
             else:
                 r = [c_path]
-                s_paths = [p for p in filter(lambda cp: cp[0] == c_path[1], chain_paths)]
+                s_paths = [p for p in filter(lambda cp: cp[0] == c_path[1], self._chain_paths)]
                 for sp in s_paths:
                     r += recursive(sp)
                 return r
 
         shortest_path_len = INFINITY
         shortest_path = []
-        chain_paths = self._chain_paths[self._for_player]
-        starting_paths = [p for p in filter(lambda cp: cp[0] == src_chain_id, chain_paths)]
+        starting_paths = [p for p in filter(lambda cp: cp[0] == src_chain_id, self._chain_paths)]
         for chain_path in starting_paths:
             path = recursive(chain_path)
             do_reduce = len(path) > 1
@@ -161,18 +153,17 @@ class ChainPathfinder(BasicPathfinder):
 
         self._dst_node = to_node
         self._for_player = for_player
-        self._chains[for_player] = [(i, c) for i, c in enumerate(self._find_chains())]
-        self._chain_paths[for_player] = self._find_paths_between_all_chains()
+        self._chains = [(i, c) for i, c in enumerate(self._find_chains())]
+        self._chain_paths = self._find_paths_between_all_chains()
 
         shortest_path = self._astar.find_path(for_player, src_x, src_y, dst_x, dst_y)
         shortest_path = [p for p in filter(lambda c: is_free_cell(c), shortest_path)]
 
         if len(shortest_path) > 2:
-            chains = self._chains[for_player]
-            for i1, chain1 in chains:
+            for i1, chain1 in self._chains:
                 beg_path, n1 = self._find_path_from_node_to_chain(from_node, chain1)
                 if n1 is not None:
-                    for i2, chain2 in chains:
+                    for i2, chain2 in self._chains:
                         end_path, n2 = self._find_path_from_node_to_chain(to_node, chain2)
                         if n2 is not None:
                             if i1 == i2:

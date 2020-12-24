@@ -178,12 +178,8 @@ class ChainPathfinder(BasicPathfinder):
                     for i2, chain2 in self._chains:
                         end_path, n2 = self._find_path_from_node_to_chain(to_node, chain2)
                         if n2 is not None:
-                            if i1 == i2:
-                                path = merge_paths(beg_path, end_path)
-                            else:
-                                path = self._find_path_between_chains(i1, i2)
-                                path = merge_paths(beg_path, path, end_path)
-                            path = finalize_path(path)
+                            mid_path = self._find_path_between_chains(i1, i2) if i1 != i2 else []
+                            path = finalize_path(merge_paths(beg_path, mid_path, end_path))
                             if len(path) < len(shortest_path):
                                 shortest_path = path
 

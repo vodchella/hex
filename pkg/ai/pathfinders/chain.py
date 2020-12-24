@@ -7,6 +7,9 @@ from pkg.constants.game import PLAYER_NONE, PLAYER_ONE, PLAYER_TWO
 from pkg.utils.paths import merge_paths
 
 
+SHORTEST_PATH_LENGTH_TO_ANALYZE = 3
+
+
 class ChainPathfinder(BasicPathfinder):
     _astar: AStarPathfinder = None
     _for_player = None
@@ -173,7 +176,7 @@ class ChainPathfinder(BasicPathfinder):
         shortest_path = self._astar.find_path(self._for_player, from_node.x(), from_node.y(), to_node.x(), to_node.y())
         shortest_path = [p for p in filter(lambda c: is_free_cell(c), shortest_path)]
 
-        if len(shortest_path) > 2:
+        if len(shortest_path) >= SHORTEST_PATH_LENGTH_TO_ANALYZE:
             for i1, chain1 in self._chains:
                 beg_path, n1 = self._find_path_from_node_to_chain(from_node, chain1)
                 if n1 is not None:
@@ -187,11 +190,11 @@ class ChainPathfinder(BasicPathfinder):
 
         return shortest_path
 
-    def _construct_full_path(self, from_node: Node, to_node: Node, path):
+    def _construct_full_path(self, src: Node, dst: Node, path):
         board = self._board.copy(check_bounds=False)
         board.set_cells(path, self._for_player)
         walker = WalkerPathfinder(board)
-        return walker.find_path(self._for_player, from_node.x(), from_node.y(), to_node.x(), to_node.y())
+        return walker.find_path(self._for_player, src.x(), src.y(), dst.x(), dst.y())
 
     def find_path(self, for_player, src_x, src_y, dst_x, dst_y):
         def cell_is_not_src_or_dst(cell):
@@ -204,27 +207,28 @@ class ChainPathfinder(BasicPathfinder):
         self._init_data()
 
         shortest_path = self._find_path(from_node, to_node)
-        shortest_full_path = self._construct_full_path(from_node, to_node, shortest_path)
         shortest_path_len = len(shortest_path)
-        shortest_full_path_len = len(shortest_full_path)
+        if shortest_path_len >= SHORTEST_PATH_LENGTH_TO_ANALYZE:
+            shortest_full_path = self._construct_full_path(from_node, to_node, shortest_path)
+            shortest_full_path_len = len(shortest_full_path)
 
-        while True:
-            found = False
-            path_without_src_and_dst = [p for p in filter(lambda c: cell_is_not_src_or_dst(c), shortest_path)]
-            new_board = self._board.copy(check_bounds=False)
-            new_board.set_cells(path_without_src_and_dst, self._opponent)
-            self._board = new_board
-            self._init_data()
-            verifiable_path = self._find_path(from_node, to_node)
-            verifiable_path_len = len(verifiable_path)
-            if verifiable_path_len == shortest_path_len:
-                verifiable_full_path = self._construct_full_path(from_node, to_node, verifiable_path)
-                verifiable_full_path_len = len(verifiable_full_path)
-                if verifiable_full_path_len < shortest_full_path_len:
-                    shortest_path = verifiable_path
-                    shortest_full_path_len = verifiable_full_path_len
-                    found = True
-            if not found:
-                break
+            while True:
+                found = False
+                path_without_src_and_dst = [p for p in filter(lambda c: cell_is_not_src_or_dst(c), shortest_path)]
+                new_board = self._board.copy(check_bounds=False)
+                new_board.set_cells(path_without_src_and_dst, self._opponent)
+                self._board = new_board
+                self._init_data()
+                verifiable_path = self._find_path(from_node, to_node)
+                verifiable_path_len = len(verifiable_path)
+                if verifiable_path_len == shortest_path_len:
+                    verifiable_full_path = self._construct_full_path(from_node, to_node, verifiable_path)
+                    verifiable_full_path_len = len(verifiable_full_path)
+                    if verifiable_full_path_len < shortest_full_path_len:
+                        shortest_path = verifiable_path
+                        shortest_full_path_len = verifiable_full_path_len
+                        found = True
+                if not found:
+                    break
 
         return shortest_path

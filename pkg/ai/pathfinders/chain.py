@@ -79,23 +79,26 @@ class ChainPathfinder(BasicPathfinder):
         shortest_path_to_dst_len = INFINITY
         shortest_path = []
         best_node = None
-        for to_node in to_chain:
+        for to_chain_node in to_chain:
             path = self._astar.find_path(
                 self._for_player,
                 from_node.x(),
                 from_node.y(),
-                to_node.x(),
-                to_node.y()
+                to_chain_node.x(),
+                to_chain_node.y()
             )
             path_len = len(path)
             if path_len == 0:
                 break
-            if path_len <= shortest_path_len:
-                the_best = True
+            if path_len < shortest_path_len:
+                shortest_path_len = path_len
+                shortest_path = path
+                best_node = to_chain_node
+            elif path_len == shortest_path_len:
                 path_to_dst = self._astar.find_path(
                     self._for_player,
-                    to_node.x(),
-                    to_node.y(),
+                    to_chain_node.x(),
+                    to_chain_node.y(),
                     self._dst_node.x(),
                     self._dst_node.y()
                 )
@@ -103,13 +106,9 @@ class ChainPathfinder(BasicPathfinder):
                 if path_to_dst_len > 0:
                     if path_to_dst_len < shortest_path_to_dst_len:
                         shortest_path_to_dst_len = path_to_dst_len
-                    else:
-                        the_best = False
-
-                if the_best:
-                    shortest_path_len = path_len
-                    shortest_path = path
-                    best_node = to_node
+                        shortest_path_len = path_len
+                        shortest_path = path
+                        best_node = to_chain_node
 
         return shortest_path[1:-1], best_node
 

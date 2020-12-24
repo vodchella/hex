@@ -2,24 +2,32 @@ from functools import reduce
 from pkg.ai.pathfinders import Node, INFINITY, to_nodes
 from pkg.ai.pathfinders.astar import AStarPathfinder
 from pkg.ai.pathfinders.basic import BasicPathfinder
+from pkg.ai.pathfinders.walker import WalkerPathfinder
 from pkg.constants.game import PLAYER_NONE, PLAYER_ONE, PLAYER_TWO
 from pkg.utils.paths import merge_paths
 
 
 class ChainPathfinder(BasicPathfinder):
-    _for_player = None
-    _dst_node = None
     _astar: AStarPathfinder = None
+    _for_player = None
+    _opponent = None
+    _dst_node = None
     _chains = []
     _chain_paths = []
 
     def __init__(self, board):
         super().__init__(board)
-        self._astar = AStarPathfinder(board)
+
+    def _init_internals(self, to_node: Node, for_player):
+        self._astar = AStarPathfinder(self._board)
+        self._dst_node = to_node
+        self._for_player = for_player
+        self._opponent = PLAYER_ONE if self._for_player == PLAYER_TWO else PLAYER_TWO
+        self._chains = [(i, c) for i, c in enumerate(self._find_chains())]
+        self._chain_paths = self._find_paths_between_all_chains()
 
     def _find_chains(self):
         result = []
-        opponent = PLAYER_ONE if self._for_player == PLAYER_TWO else PLAYER_TWO
         explored = []
         board = self._board
         w, h = board.get_dimensions()
@@ -36,7 +44,7 @@ class ChainPathfinder(BasicPathfinder):
                             reachable.remove(node)
                             explored.append(node)
                             chain.append(node)
-                            cells = board.get_cell_neighbors(node.x(), node.y(), [opponent, PLAYER_NONE])
+                            cells = board.get_cell_neighbors(node.x(), node.y(), [self._opponent, PLAYER_NONE])
                             new_reachable = [n for n in filter(lambda n: n not in explored, to_nodes(cells))]
                             for adjacent in new_reachable:
                                 if adjacent not in reachable:
@@ -177,13 +185,48 @@ class ChainPathfinder(BasicPathfinder):
 
         return shortest_path
 
+    def _construct_full_path(self, from_node: Node, to_node: Node, path):
+        board = self._board.copy(check_bounds=False)
+        board.set_cells(path, self._for_player)
+        walker = WalkerPathfinder(board)
+        return walker.find_path(self._for_player, from_node.x(), from_node.y(), to_node.x(), to_node.y())
+
     def find_path(self, for_player, src_x, src_y, dst_x, dst_y):
+        def cell_is_not_src_or_dst(cell):
+            node = Node(cell[0], cell[1])
+            return node != from_node and node != to_node
+
         from_node = Node(src_x, src_y)
         to_node = Node(dst_x, dst_y)
+        self._init_internals(to_node, for_player)
 
-        self._dst_node = to_node
-        self._for_player = for_player
-        self._chains = [(i, c) for i, c in enumerate(self._find_chains())]
-        self._chain_paths = self._find_paths_between_all_chains()
+        shortest_path = self._find_path(from_node, to_node)
+        shortest_full_path = self._construct_full_path(from_node, to_node, shortest_path)
+        shortest_path_len = len(shortest_path)
+        shortest_full_path_len = len(shortest_full_path)
 
-        return self._find_path(from_node, to_node)
+        while True:
+            found = False
+            path_without_src_and_dst = [p for p in filter(lambda c: cell_is_not_src_or_dst(c), shortest_path)]
+            new_board = self._board.copy(check_bounds=False)
+            new_board.set_cells(path_without_src_and_dst, self._opponent)
+            self._board = new_board
+            self._init_internals(to_node, for_player)
+            verifiable_path = self._find_path(from_node, to_node)
+            verifiable_path_len = len(verifiable_path)
+            if verifiable_path_len != 0:
+                if verifiable_path_len == shortest_path_len:
+                    verifiable_full_path = self._construct_full_path(from_node, to_node, verifiable_path)
+                    verifiable_full_path_len = len(verifiable_full_path)
+                    if verifiable_full_path_len < shortest_full_path_len:
+                        shortest_path = verifiable_path
+                        shortest_full_path_len = verifiable_full_path_len
+                        found = True
+                elif verifiable_path_len < shortest_path_len:
+                    shortest_path = verifiable_path
+                    shortest_path_len = verifiable_path_len
+                    found = True
+            if not found:
+                break
+
+        return shortest_path

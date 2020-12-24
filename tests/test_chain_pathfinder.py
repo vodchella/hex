@@ -33,12 +33,13 @@ def _init_test_board():
 
 class TestChainPathfinder:
     def test_1(self):
-        pf = ChainPathfinder(_init_test_board())
+        board = _init_test_board()
+        pf = ChainPathfinder(board)
         path = pf.find_path(PLAYER_ONE, 6, 0, 6, 6)
 
         assert compare_paths(
             path,
-            [(6, 0), (4, 4), (4, 3), (4, 2), (5, 1), (6, 6)]
+            [(6, 0), (3, 3), (4, 2), (5, 1), (3, 4), (6, 6)]
         )
 
     def test_2(self):

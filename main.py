@@ -6,17 +6,21 @@ from pkg.views.console_board_view import ConsoleBoardView
 if __name__ == '__main__':
     board = Board(7, 7)
 
-    board.set_cell(3, 0, PLAYER_ONE)
-    board.set_cell(4, 0, PLAYER_ONE)
+    board.set_cell(1, 4, PLAYER_ONE)
+    board.set_cell(2, 4, PLAYER_ONE)
+    board.set_cell(3, 4, PLAYER_ONE)
+    board.set_cell(4, 4, PLAYER_ONE)
+    board.set_cell(5, 4, PLAYER_ONE)
+    board.set_cell(5, 4, PLAYER_ONE)
 
-    board.set_cell(5, 1, PLAYER_ONE)
-    board.set_cell(5, 2, PLAYER_ONE)
+    board.set_cell(1, 5, PLAYER_ONE)
+    board.set_cell(1, 6, PLAYER_ONE)
 
-    board.set_cell(6, 3, PLAYER_ONE)
-    board.set_cell(6, 4, PLAYER_ONE)
+    board.set_cell(2, 6, PLAYER_ONE)
+    board.set_cell(3, 6, PLAYER_ONE)
 
     pf = ChainPathfinder(board)
-    path = pf.find_path(PLAYER_ONE, 0, 0, 6, 6)
+    path = pf.find_path(PLAYER_ONE, 5, 5, 0, 6)
     board.set_cells(path, PLAYER_VIRTUAL)
 
     c_view = ConsoleBoardView(board)

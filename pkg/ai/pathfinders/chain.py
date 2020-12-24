@@ -46,16 +46,23 @@ class ChainPathfinder(BasicPathfinder):
         return result
 
     def _find_paths_between_all_chains(self):
-        result = []
+        paths = []
+
+        def find_path(i1, i2):
+            result = [p for p in filter(lambda p: p[0] == i1 and p[1] == i2, paths)]
+            return result[0] if len(result) > 0 else None
+
         if len(self._chains) > 1:
-            processed = []
             for (i, chain_from) in self._chains:
-                processed.append(i)
-                for (j, chain_to) in filter(lambda c: c[0] not in processed, self._chains):
-                    path, node_from, node_to = self._find_path_between_two_chains(chain_from, chain_to)
-                    if len(path):
-                        result.append((i, j, path, node_from, node_to))
-        return result
+                for (j, chain_to) in self._chains:
+                    existing_path = find_path(j, i)
+                    if existing_path:
+                        paths.append((i, j, existing_path[2], existing_path[3], existing_path[4]))
+                    else:
+                        path, node_from, node_to = self._find_path_between_two_chains(chain_from, chain_to)
+                        if len(path):
+                            paths.append((i, j, path, node_from, node_to))
+        return paths
 
     def _find_path_between_two_chains(self, chain_from, chain_to):
         shortest_path_len = INFINITY
@@ -113,12 +120,17 @@ class ChainPathfinder(BasicPathfinder):
         return shortest_path[1:-1], best_node
 
     def _find_path_between_chains(self, src_chain_id: int, dst_chain_id: int):
+        visited_ids = []
+
         def recursive(c_path):
+            visited_ids.append(c_path[0])
             if c_path[1] == dst_chain_id:
                 return [c_path]
             else:
                 r = [c_path]
-                s_paths = [p for p in filter(lambda cp: cp[0] == c_path[1], self._chain_paths)]
+                s_paths = [p for p in filter(
+                    lambda cp: cp[0] == c_path[1] and cp[1] not in visited_ids, self._chain_paths
+                )]
                 for sp in s_paths:
                     r += recursive(sp)
                 return r
@@ -127,6 +139,7 @@ class ChainPathfinder(BasicPathfinder):
         shortest_path = []
         starting_paths = [p for p in filter(lambda cp: cp[0] == src_chain_id, self._chain_paths)]
         for chain_path in starting_paths:
+            visited_ids = []
             path = recursive(chain_path)
             do_reduce = len(path) > 1
             path_len = reduce(lambda a, b: len(a[2]) + len(b[2]), path) if do_reduce else len(path[0][2])

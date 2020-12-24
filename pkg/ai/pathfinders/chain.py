@@ -18,11 +18,13 @@ class ChainPathfinder(BasicPathfinder):
     def __init__(self, board):
         super().__init__(board)
 
-    def _init_internals(self, to_node: Node, for_player):
-        self._astar = AStarPathfinder(self._board)
+    def _init_vars(self, to_node: Node, for_player):
         self._dst_node = to_node
         self._for_player = for_player
         self._opponent = PLAYER_ONE if self._for_player == PLAYER_TWO else PLAYER_TWO
+
+    def _init_data(self):
+        self._astar = AStarPathfinder(self._board)
         self._chains = [(i, c) for i, c in enumerate(self._find_chains())]
         self._chain_paths = self._find_paths_between_all_chains()
 
@@ -198,7 +200,8 @@ class ChainPathfinder(BasicPathfinder):
 
         from_node = Node(src_x, src_y)
         to_node = Node(dst_x, dst_y)
-        self._init_internals(to_node, for_player)
+        self._init_vars(to_node, for_player)
+        self._init_data()
 
         shortest_path = self._find_path(from_node, to_node)
         shortest_full_path = self._construct_full_path(from_node, to_node, shortest_path)
@@ -211,7 +214,7 @@ class ChainPathfinder(BasicPathfinder):
             new_board = self._board.copy(check_bounds=False)
             new_board.set_cells(path_without_src_and_dst, self._opponent)
             self._board = new_board
-            self._init_internals(to_node, for_player)
+            self._init_data()
             verifiable_path = self._find_path(from_node, to_node)
             verifiable_path_len = len(verifiable_path)
             if verifiable_path_len != 0:

@@ -149,10 +149,7 @@ class ChainPathfinder(BasicPathfinder):
 
         return shortest_path
 
-    def find_path(self, for_player, src_x, src_y, dst_x, dst_y):
-        from_node = Node(src_x, src_y)
-        to_node = Node(dst_x, dst_y)
-
+    def _find_path(self, from_node: Node, to_node: Node):
         def is_free_cell(cell):
             return self._board.get_cell(cell[0], cell[1]) == PLAYER_NONE
 
@@ -163,12 +160,7 @@ class ChainPathfinder(BasicPathfinder):
             end_p = [end] if is_free_cell(end) else []
             return merge_paths(beg_p, path_to_finalize, end_p)
 
-        self._dst_node = to_node
-        self._for_player = for_player
-        self._chains = [(i, c) for i, c in enumerate(self._find_chains())]
-        self._chain_paths = self._find_paths_between_all_chains()
-
-        shortest_path = self._astar.find_path(for_player, src_x, src_y, dst_x, dst_y)
+        shortest_path = self._astar.find_path(self._for_player, from_node.x(), from_node.y(), to_node.x(), to_node.y())
         shortest_path = [p for p in filter(lambda c: is_free_cell(c), shortest_path)]
 
         if len(shortest_path) > 2:
@@ -184,3 +176,14 @@ class ChainPathfinder(BasicPathfinder):
                                 shortest_path = path
 
         return shortest_path
+
+    def find_path(self, for_player, src_x, src_y, dst_x, dst_y):
+        from_node = Node(src_x, src_y)
+        to_node = Node(dst_x, dst_y)
+
+        self._dst_node = to_node
+        self._for_player = for_player
+        self._chains = [(i, c) for i, c in enumerate(self._find_chains())]
+        self._chain_paths = self._find_paths_between_all_chains()
+
+        return self._find_path(from_node, to_node)

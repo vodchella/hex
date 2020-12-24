@@ -217,17 +217,12 @@ class ChainPathfinder(BasicPathfinder):
             self._init_data()
             verifiable_path = self._find_path(from_node, to_node)
             verifiable_path_len = len(verifiable_path)
-            if verifiable_path_len != 0:
-                if verifiable_path_len == shortest_path_len:
-                    verifiable_full_path = self._construct_full_path(from_node, to_node, verifiable_path)
-                    verifiable_full_path_len = len(verifiable_full_path)
-                    if verifiable_full_path_len < shortest_full_path_len:
-                        shortest_path = verifiable_path
-                        shortest_full_path_len = verifiable_full_path_len
-                        found = True
-                elif verifiable_path_len < shortest_path_len:
+            if verifiable_path_len == shortest_path_len:
+                verifiable_full_path = self._construct_full_path(from_node, to_node, verifiable_path)
+                verifiable_full_path_len = len(verifiable_full_path)
+                if verifiable_full_path_len < shortest_full_path_len:
                     shortest_path = verifiable_path
-                    shortest_path_len = verifiable_path_len
+                    shortest_full_path_len = verifiable_full_path_len
                     found = True
             if not found:
                 break

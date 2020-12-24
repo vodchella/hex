@@ -2,7 +2,6 @@ from functools import reduce
 from pkg.ai.pathfinders import Node, INFINITY, to_nodes
 from pkg.ai.pathfinders.astar import AStarPathfinder
 from pkg.ai.pathfinders.basic import BasicPathfinder
-from pkg.ai.pathfinders.walker import WalkerPathfinder
 from pkg.constants.game import PLAYER_NONE, PLAYER_ONE, PLAYER_TWO
 from pkg.utils.paths import merge_paths
 
@@ -11,7 +10,6 @@ class ChainPathfinder(BasicPathfinder):
     _for_player = None
     _dst_node = None
     _astar: AStarPathfinder = None
-    _walker: WalkerPathfinder = None
     _chains = {
         PLAYER_ONE: [],
         PLAYER_TWO: [],
@@ -24,7 +22,6 @@ class ChainPathfinder(BasicPathfinder):
     def __init__(self, board):
         super().__init__(board)
         self._astar = AStarPathfinder(board)
-        self._walker = WalkerPathfinder(board)
 
     def _find_chains(self):
         result = []
@@ -152,14 +149,24 @@ class ChainPathfinder(BasicPathfinder):
         from_node = Node(src_x, src_y)
         to_node = Node(dst_x, dst_y)
 
+        def is_free_cell(cell):
+            return self._board.get_cell(cell[0], cell[1]) == PLAYER_NONE
+
+        def finalize_path(path_to_finalize):
+            beg = from_node.tuple()
+            end = to_node.tuple()
+            beg_p = [beg] if is_free_cell(beg) else []
+            end_p = [end] if is_free_cell(end) else []
+            return merge_paths(beg_p, path_to_finalize, end_p)
+
         self._dst_node = to_node
         self._for_player = for_player
         self._chains[for_player] = [(i, c) for i, c in enumerate(self._find_chains())]
         self._chain_paths[for_player] = self._find_paths_between_all_chains()
 
-        shortest_path_with_one_chain = True
-        shortest_full_path = []
         shortest_path = self._astar.find_path(for_player, src_x, src_y, dst_x, dst_y)
+        shortest_path = [p for p in filter(lambda c: is_free_cell(c), shortest_path)]
+
         if len(shortest_path) > 2:
             chains = self._chains[for_player]
             for i1, chain1 in chains:
@@ -168,31 +175,13 @@ class ChainPathfinder(BasicPathfinder):
                     for i2, chain2 in chains:
                         end_path, n2 = self._find_path_from_node_to_chain(to_node, chain2)
                         if n2 is not None:
-                            path_with_one_chain = i1 == i2
-                            if path_with_one_chain:
-                                filled = self._walker.find_path(
-                                    self._for_player,
-                                    n1.x(), n1.y(),
-                                    n2.x(), n2.y()
-                                )
-                                path = merge_paths([from_node.tuple()], beg_path, end_path, [to_node.tuple()])
-                                full = merge_paths([from_node.tuple()], beg_path, filled, end_path, [to_node.tuple()])
+                            if i1 == i2:
+                                path = merge_paths(beg_path, end_path)
                             else:
                                 path = self._find_path_between_chains(i1, i2)
-                                path = merge_paths([from_node.tuple()], beg_path, path, end_path, [to_node.tuple()])
-                                full = []
+                                path = merge_paths(beg_path, path, end_path)
                             if len(path) <= len(shortest_path):
                                 shortest_path = path
-                                shortest_full_path = full
-                                shortest_path_with_one_chain = path_with_one_chain
+            shortest_path = finalize_path(shortest_path)
 
-        if not shortest_path_with_one_chain:
-            board = self._board.copy(check_bounds=False)
-            board.set_cells(shortest_path, for_player)
-            pf = WalkerPathfinder(board)
-            shortest_full_path = pf.find_path(for_player, src_x, src_y, dst_x, dst_y)
-
-        return {
-            'path': shortest_path,
-            'full': shortest_full_path,
-        }
+        return shortest_path

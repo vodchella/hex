@@ -34,7 +34,7 @@ def _init_test_board():
 class TestChainPathfinder:
     def test_1(self):
         pf = ChainPathfinder(_init_test_board())
-        path = pf.find_path(PLAYER_ONE, 6, 0, 6, 6)['path']
+        path = pf.find_path(PLAYER_ONE, 6, 0, 6, 6)
 
         assert compare_paths(
             path,
@@ -47,7 +47,7 @@ class TestChainPathfinder:
         board.set_cell(1, 2, PLAYER_NONE)
 
         pf = ChainPathfinder(board)
-        path = pf.find_path(PLAYER_ONE, 6, 0, 6, 6)['path']
+        path = pf.find_path(PLAYER_ONE, 6, 0, 6, 6)
 
         assert compare_paths(
             path,
@@ -61,7 +61,7 @@ class TestChainPathfinder:
         board.set_cell(2, 1, PLAYER_TWO)
 
         pf = ChainPathfinder(board)
-        path = pf.find_path(PLAYER_ONE, 0, 0, 2, 2)['path']
+        path = pf.find_path(PLAYER_ONE, 0, 0, 2, 2)
 
         assert len(path) == 0
 
@@ -77,7 +77,7 @@ class TestChainPathfinder:
         board.set_cell(1, 5, PLAYER_ONE)
 
         pf = ChainPathfinder(board)
-        path = pf.find_path(PLAYER_ONE, 6, 0, 6, 6)['path']
+        path = pf.find_path(PLAYER_ONE, 6, 0, 6, 6)
 
         assert compare_paths(
             path,
@@ -91,15 +91,10 @@ class TestChainPathfinder:
         board.set_cell(6, 4, PLAYER_ONE)
 
         pf = ChainPathfinder(board)
-        paths = pf.find_path(PLAYER_ONE, 6, 0, 6, 6)
+        path = pf.find_path(PLAYER_ONE, 6, 0, 6, 6)
 
         assert compare_paths(
-            paths['full'],
-            [(6, 6), (6, 5), (6, 4), (6, 3), (6, 2), (6, 1), (6, 0)]
-        )
-
-        assert compare_paths(
-            paths['path'],
+            path,
             [(6, 0), (6, 2), (6, 1), (6, 5), (6, 6)]
         )
 
@@ -113,14 +108,9 @@ class TestChainPathfinder:
         board.set_cell(6, 4, PLAYER_ONE)
 
         pf = ChainPathfinder(board)
-        paths = pf.find_path(PLAYER_ONE, 0, 0, 6, 6)
+        path = pf.find_path(PLAYER_ONE, 0, 0, 6, 6)
 
         assert compare_paths(
-            paths['full'],
-            [(6, 6), (6, 5), (6, 4), (6, 3), (6, 2), (5, 2), (5, 1), (5, 0), (4, 0), (3, 0), (2, 0), (1, 0), (0, 0)]
-        )
-
-        assert compare_paths(
-            paths['path'],
+            path,
             [(0, 0), (2, 0), (1, 0), (5, 0), (6, 2), (6, 5), (6, 6)]
         )

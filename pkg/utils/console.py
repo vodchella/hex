@@ -1,5 +1,6 @@
-import os
 import sys
+
+from pkg.utils import bye
 from pkg.utils.errors import get_raised_error
 
 
@@ -19,5 +20,4 @@ def panic(msg: str = None, show_original_error: bool = False):
     elif show_original_error:
         write_stderr(get_raised_error())
     write_stderr(f'{msg}\n')
-    # noinspection PyProtectedMember
-    os._exit(1)
+    bye(1)

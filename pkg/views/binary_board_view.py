@@ -1,19 +1,11 @@
 from pkg.constants.game import PLAYER_NONE, PLAYER_VIRTUAL
-from pkg.models.board import Board
+from pkg.views import BaseBoardView
 
 CELLS_IN_BYTE = 4
 BITS_PER_CELL = 2
 
 
-class BinaryBoardView:
-    _board: Board = None
-
-    def __init__(self, board):
-        self.set_board(board)
-
-    def set_board(self, board):
-        self._board = board
-
+class BinaryBoardView(BaseBoardView):
     def render(self):
         if self._board:
             w, h = self._board.get_dimensions()

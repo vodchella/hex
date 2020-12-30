@@ -1,4 +1,4 @@
-from pkg.models.board import Board
+from pkg.views import BaseBoardView
 
 PLAYER_CHARS = [' ', 'O', '*', '-']
 
@@ -7,15 +7,7 @@ def char(player):
     return PLAYER_CHARS[player]
 
 
-class ConsoleBoardView:
-    _board: Board = None
-
-    def __init__(self, board):
-        self.set_board(board)
-
-    def set_board(self, board):
-        self._board = board
-
+class ConsoleBoardView(BaseBoardView):
     def render(self):
         if self._board:
             w, h = self._board.get_dimensions()

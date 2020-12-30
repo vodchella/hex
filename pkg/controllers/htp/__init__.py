@@ -1,5 +1,6 @@
 import sys
 from pkg.controllers import BaseController
+from pkg.controllers.htp.htp_response import HtpResponse
 from pkg.utils.console import write_stdout
 
 
@@ -8,17 +9,17 @@ class HtpController(BaseController):
         for line in sys.stdin:
             cmd = line.strip('\n')
             if cmd == 'name':
-                write_stdout('= PyHex\n')
+                resp = HtpResponse('PyHex')
             elif cmd == 'version':
-                write_stdout('= 0.0.1\n')
+                resp = HtpResponse('0.0.1')
             elif cmd == 'hexgui-analyze_commands':
-                write_stdout('= \n')
+                resp = HtpResponse()
             elif cmd.startswith('boardsize'):
-                write_stdout('= \n')
+                resp = HtpResponse()
             elif cmd.startswith('play'):
-                write_stdout('= \n')
+                resp = HtpResponse()
             elif cmd.startswith('genmove'):
-                write_stdout('= \n')
+                resp = HtpResponse()
             else:
-                write_stdout(f'? unknown command: {cmd}\n')
-            write_stdout('\n')
+                resp = HtpResponse(error=f'unknown command: {cmd}')
+            resp.do()

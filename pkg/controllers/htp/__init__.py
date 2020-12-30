@@ -3,7 +3,6 @@ import sys
 from pkg.controllers import BaseController
 from pkg.controllers.htp.response import HtpResponse
 from pkg.models.board import Board
-from pkg.views.string_board_view import StringBoardView
 
 
 class HtpController(BaseController):

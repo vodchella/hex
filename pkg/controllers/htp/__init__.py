@@ -1,7 +1,6 @@
 import sys
 from pkg.controllers import BaseController
-from pkg.controllers.htp.htp_response import HtpResponse
-from pkg.utils.console import write_stdout
+from pkg.controllers.htp.response import HtpResponse
 
 
 class HtpController(BaseController):

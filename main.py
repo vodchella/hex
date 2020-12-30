@@ -2,10 +2,10 @@
 
 from pkg.ai.default import DefaultAI
 from pkg.controllers.htp import HtpController
-from pkg.views import BaseBoardView
+from pkg.views.string_board_view import StringBoardView
 
 if __name__ == '__main__':
     ai = DefaultAI()
-    view = BaseBoardView()
+    view = StringBoardView(for_hexgui=True)
     ctrl = HtpController(ai, view)
     ctrl.run()

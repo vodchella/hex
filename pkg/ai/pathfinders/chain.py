@@ -4,7 +4,7 @@ from pkg.ai.pathfinders.astar import AStarPathfinder
 from pkg.ai.pathfinders.basic import BasicPathfinder
 from pkg.ai.pathfinders.walker import WalkerPathfinder
 from pkg.constants.game import PLAYER_NONE, PLAYER_ONE, PLAYER_TWO
-from pkg.utils.paths import merge_paths
+from pkg.ai.pathfinders.utils.paths import merge_paths
 
 
 SHORTEST_PATH_LENGTH_TO_ANALYZE = 3

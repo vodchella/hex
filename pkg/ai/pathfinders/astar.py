@@ -1,6 +1,6 @@
 from pkg.ai.pathfinders import Node, INFINITY
 from pkg.ai.pathfinders.basic import BasicPathfinder
-from pkg.utils.hex import get_distance
+from pkg.ai.utils.hex import get_distance
 
 
 class AStarPathfinder(BasicPathfinder):

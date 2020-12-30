@@ -1,7 +1,7 @@
 from pkg.ai.pathfinders.chain import ChainPathfinder
 from pkg.constants.game import PLAYER_ONE, PLAYER_TWO, PLAYER_NONE
 from pkg.models.board import Board
-from pkg.utils.paths import compare_paths
+from pkg.ai.pathfinders.utils.paths import compare_paths
 
 
 def _init_test_board():
